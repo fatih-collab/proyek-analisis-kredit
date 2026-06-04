@@ -1,0 +1,94 @@
+artifact_path: mlflow-artifacts:/1/models/m-bc9e137e4b3741c2a59fe616b829092a/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.12.9
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.4.2
+    skops_trusted_types: null
+is_signature_from_type_hint: false
+mlflow_version: 3.12.0
+model_id: m-bc9e137e4b3741c2a59fe616b829092a
+model_size_bytes: 325868
+model_uuid: m-bc9e137e4b3741c2a59fe616b829092a
+prompts: null
+run_id: 5be7cb5086924c37b9f013b96c83dcb7
+saved_input_example_info:
+  artifact_path: input_example.json
+  pandas_orient: split
+  serving_input_path: serving_input_example.json
+  type: dataframe
+signature:
+  inputs: '[{"type": "long", "name": "Term", "required": true}, {"type": "double",
+    "name": "BorrowerRate", "required": true}, {"type": "double", "name": "LenderYield",
+    "required": true}, {"type": "double", "name": "EstimatedEffectiveYield", "required":
+    true}, {"type": "double", "name": "EstimatedLoss", "required": true}, {"type":
+    "double", "name": "EstimatedReturn", "required": true}, {"type": "double", "name":
+    "ProsperRating_numeric", "required": true}, {"type": "double", "name": "ProsperScore",
+    "required": true}, {"type": "long", "name": "BorrowerState", "required": true},
+    {"type": "long", "name": "Occupation", "required": true}, {"type": "double", "name":
+    "EmploymentStatusDuration", "required": true}, {"type": "long", "name": "IsBorrowerHomeowner",
+    "required": true}, {"type": "long", "name": "CurrentlyInGroup", "required": true},
+    {"type": "double", "name": "CreditScoreRangeLower", "required": true}, {"type":
+    "double", "name": "CreditScoreRangeUpper", "required": true}, {"type": "double",
+    "name": "CurrentCreditLines", "required": true}, {"type": "double", "name": "OpenCreditLines",
+    "required": true}, {"type": "double", "name": "TotalCreditLinespast7years", "required":
+    true}, {"type": "long", "name": "OpenRevolvingAccounts", "required": true}, {"type":
+    "double", "name": "OpenRevolvingMonthlyPayment", "required": true}, {"type": "double",
+    "name": "InquiriesLast6Months", "required": true}, {"type": "double", "name":
+    "TotalInquiries", "required": true}, {"type": "double", "name": "CurrentDelinquencies",
+    "required": true}, {"type": "double", "name": "AmountDelinquent", "required":
+    true}, {"type": "double", "name": "DelinquenciesLast7Years", "required": true},
+    {"type": "double", "name": "PublicRecordsLast10Years", "required": true}, {"type":
+    "double", "name": "PublicRecordsLast12Months", "required": true}, {"type": "double",
+    "name": "RevolvingCreditBalance", "required": true}, {"type": "double", "name":
+    "BankcardUtilization", "required": true}, {"type": "double", "name": "AvailableBankcardCredit",
+    "required": true}, {"type": "double", "name": "TotalTrades", "required": true},
+    {"type": "double", "name": "TradesNeverDelinquent_percentage", "required": true},
+    {"type": "double", "name": "TradesOpenedLast6Months", "required": true}, {"type":
+    "double", "name": "DebtToIncomeRatio", "required": true}, {"type": "long", "name":
+    "IncomeVerifiable", "required": true}, {"type": "double", "name": "StatedMonthlyIncome",
+    "required": true}, {"type": "long", "name": "LoanOriginalAmount", "required":
+    true}, {"type": "double", "name": "MonthlyLoanPayment", "required": true}, {"type":
+    "double", "name": "PercentFunded", "required": true}, {"type": "long", "name":
+    "Recommendations", "required": true}, {"type": "long", "name": "InvestmentFromFriendsCount",
+    "required": true}, {"type": "double", "name": "InvestmentFromFriendsAmount", "required":
+    true}, {"type": "long", "name": "Investors", "required": true}, {"type": "long",
+    "name": "CreditLabel", "required": true}, {"type": "long", "name": "EstimatedEffectiveYield_is_missing",
+    "required": true}, {"type": "long", "name": "EstimatedLoss_is_missing", "required":
+    true}, {"type": "long", "name": "EstimatedReturn_is_missing", "required": true},
+    {"type": "long", "name": "ProsperRating_numeric_is_missing", "required": true},
+    {"type": "long", "name": "ProsperRating_Alpha_is_missing", "required": true},
+    {"type": "long", "name": "ProsperScore_is_missing", "required": true}, {"type":
+    "double", "name": "CreditScoreMid", "required": true}, {"type": "double", "name":
+    "CreditScoreRange", "required": true}, {"type": "double", "name": "PaymentToLoanRatio",
+    "required": true}, {"type": "double", "name": "IncomePaymentRatio", "required":
+    true}, {"type": "double", "name": "InquiryRatio", "required": true}, {"type":
+    "double", "name": "CreditLineUtilization", "required": true}, {"type": "long",
+    "name": "EmploymentStatus_Employed", "required": true}, {"type": "long", "name":
+    "EmploymentStatus_Full_time", "required": true}, {"type": "long", "name": "EmploymentStatus_Not_available",
+    "required": true}, {"type": "long", "name": "EmploymentStatus_Not_employed", "required":
+    true}, {"type": "long", "name": "EmploymentStatus_Other", "required": true}, {"type":
+    "long", "name": "EmploymentStatus_Part_time", "required": true}, {"type": "long",
+    "name": "EmploymentStatus_Retired", "required": true}, {"type": "long", "name":
+    "EmploymentStatus_Self_employed", "required": true}, {"type": "long", "name":
+    "EmploymentStatus_Unknown", "required": true}, {"type": "long", "name": "IncomeRange_0",
+    "required": true}, {"type": "long", "name": "IncomeRange_1_24_999", "required":
+    true}, {"type": "long", "name": "IncomeRange_100_000", "required": true}, {"type":
+    "long", "name": "IncomeRange_25_000_49_999", "required": true}, {"type": "long",
+    "name": "IncomeRange_50_000_74_999", "required": true}, {"type": "long", "name":
+    "IncomeRange_75_000_99_999", "required": true}, {"type": "long", "name": "IncomeRange_Not_displayed",
+    "required": true}, {"type": "long", "name": "IncomeRange_Not_employed", "required":
+    true}]'
+  outputs: '[{"type": "double", "name": "BorrowerAPR_pred", "required": true}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2026-05-12 06:51:21.855141'
