@@ -20,8 +20,15 @@ services:
   # ── Backend (FastAPI) ──
   backend:
     build:
-      context: .
-      dockerfile: backend/Dockerfile
+      context: ./backend
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    volumes:
+      # Mount model files from root
+      - ./best_model_regresi2.pkl:/app/../best_model_regresi2.pkl:ro
+      - ./model_tuned_final.pkl:/app/../model_tuned_final.pkl:ro
+      - ./threshold_tuned.pkl:/app/../threshold_tuned.pkl:ro
+      - ./best_params.pkl:/app/../best_params.pkl:ro
+      - ./selected_features.pkl:/app/../selected_features.pkl:ro
     restart: unless-stopped
