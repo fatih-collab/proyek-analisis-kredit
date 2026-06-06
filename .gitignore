@@ -1,0 +1,32 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Caches and logs
+backend/prediction_logs.json
+*.log
+
+# Large Datasets
+Dataset/
+*.csv
+
+# Models (except the tuned ones we want to push)
+# If you want to push model .pkl, do not ignore them here.
+# We will explicitly add model_tuned_final.pkl, threshold_tuned.pkl, best_model_regresi2.pkl.
+
+# Next.js / Node
+node_modules/
+.next/
+out/
+build/
+.vercel/
+
+# MLflow
+mlruns/
+mlartifacts/
+mlflow.db
+
+# Other caches
+catboost_info/
+.dvc/
