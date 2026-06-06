@@ -43,7 +43,7 @@ export default function Header() {
               <CreditCard className="w-4 h-4 md:w-5 md:h-5 text-white" />
             </div>
             <span className="text-sm md:text-base font-black text-sky-900 dark:text-sky-100" style={{ letterSpacing: '-0.03em' }}>
-              Kreditin<span className="gradient-text ml-0.5">Aja!</span>
+              Kredit<span className="gradient-text ml-0.5">Cerdas</span>
             </span>
           </Link>
 

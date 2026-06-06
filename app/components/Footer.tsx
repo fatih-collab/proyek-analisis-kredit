@@ -14,11 +14,11 @@ export default function Footer() {
                 <Cpu className="w-5 h-5 text-white" />
               </div>
               <span className="text-base font-extrabold text-sky-900 dark:text-sky-100" style={{ letterSpacing: '-0.02em' }}>
-                KreditinAja!
+                KreditCerdas
               </span>
             </div>
             <p className="text-sm text-sky-700/60 dark:text-sky-300/50 leading-relaxed max-w-xs">
-              Platform analisis risiko dan deteksi kelayakan nasabah pinjaman berbasis MLOps dengan algoritma Gradient Boosting.
+              Analisis Prediktif Risiko Kredit dan Penentuan Batas Pinjaman Maksimal Menggunakan Algoritma Machine Learning.
             </p>
           </div>
           <div>
@@ -53,11 +53,11 @@ export default function Footer() {
         </div>
         <div className="pt-6 border-t border-sky-100/50 dark:border-sky-800/30 flex flex-col md:flex-row items-center justify-between gap-3">
           <p className="text-xs text-sky-500/60 dark:text-sky-400/50">
-            © {new Date().getFullYear()} KreditinAja! — MLOps Gradient Boosting.
+            © {new Date().getFullYear()} KreditCerdas — Machine Learning Credit Scoring.
           </p>
           <div className="flex items-center gap-4">
             <a href="https://github.com" target="_blank" rel="noopener" className="text-sky-500/50 hover:text-sky-600 transition-colors"><ExternalLink className="w-4 h-4" /></a>
-            <a href="mailto:info@kreditinaja.id" className="text-sky-500/50 hover:text-sky-600 transition-colors"><Mail className="w-4 h-4" /></a>
+            <a href="mailto:info@kreditcerdas.id" className="text-sky-500/50 hover:text-sky-600 transition-colors"><Mail className="w-4 h-4" /></a>
           </div>
         </div>
       </div>

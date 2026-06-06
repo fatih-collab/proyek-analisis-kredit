@@ -76,7 +76,7 @@ export default function AdminLoginPage() {
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sky-400/60" />
                     <input type="email" value={form.email} onChange={(e) => setForm(f => ({ ...f, email: e.target.value }))}
-                      className="w-full pl-10 pr-4 py-3 rounded-xl bg-sky-50/60 dark:bg-sky-900/20 border border-sky-200/40 dark:border-sky-700/30 text-sky-900 dark:text-sky-100 text-sm font-medium placeholder:text-sky-400/40 transition-all" placeholder="admin@kreditinaja.id" />
+                      className="w-full pl-10 pr-4 py-3 rounded-xl bg-sky-50/60 dark:bg-sky-900/20 border border-sky-200/40 dark:border-sky-700/30 text-sky-900 dark:text-sky-100 text-sm font-medium placeholder:text-sky-400/40 transition-all" placeholder="admin@kreditcerdas.id" />
                   </div>
                 </div>
                 <div>

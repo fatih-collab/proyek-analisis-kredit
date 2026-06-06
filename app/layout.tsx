@@ -3,8 +3,8 @@ import "./globals.css";
 import { AuthProvider } from "./context/AuthContext";
 
 export const metadata: Metadata = {
-  title: "KreditinAja! — Deteksi Kelayakan Nasabah Pinjaman",
-  description: "Platform evaluasi otomatis kelayakan nasabah dalam mengajukan pinjaman berbasis data menggunakan algoritma skoring risiko yang terpercaya.",
+  title: "KreditCerdas — Konsultan & Verifikasi Kredit Pra-Prosper",
+  description: "Optimalkan profil risiko Anda dan dapatkan analisis kelayakan kredit sebelum mengajukan pinjaman ke platform Prosper untuk meyakinkan investor.",
 };
 
 export default function RootLayout({

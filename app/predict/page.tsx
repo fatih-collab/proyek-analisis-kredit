@@ -69,7 +69,7 @@ function ConfidenceRing({ value, color }: { value: number; color: string }) {
       </svg>
       <div className="absolute flex flex-col items-center justify-center">
         <span className="text-2xl font-black tracking-tight" style={{ color }}>{value}%</span>
-        <span className="text-xs font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-0.5">Confidence</span>
+        <span className="text-xs font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-0.5">Trust Index</span>
       </div>
     </div>
   );
@@ -102,7 +102,7 @@ function CreditCardMockup({ userName, limit }: { userName: string; limit: number
         <div className="text-right">
           <div className="flex items-center gap-1.5 justify-end">
             <CreditCard className="w-4 h-4 text-sky-400" />
-            <span className="text-xs font-black tracking-[0.1em] text-slate-200 uppercase">KreditinAja!</span>
+            <span className="text-xs font-black tracking-[0.1em] text-slate-200 uppercase">KreditCerdas</span>
           </div>
           <span className="text-[9px] font-bold text-sky-400/60 uppercase tracking-widest">Premium Active</span>
         </div>
@@ -110,7 +110,7 @@ function CreditCardMockup({ userName, limit }: { userName: string; limit: number
 
       {/* Middle row: Credit Limit Balance */}
       <div className="z-10">
-        <span className="text-xs font-black text-slate-400/80 uppercase tracking-widest">Approved Credit Limit</span>
+        <span className="text-xs font-black text-slate-400/80 uppercase tracking-widest">Prosper Recommended Limit</span>
         <div className="text-3xl font-black text-emerald-400 tracking-tight mt-0.5 filter drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]">
           ${limit.toLocaleString('en-US')}
         </div>
@@ -124,7 +124,7 @@ function CreditCardMockup({ userName, limit }: { userName: string; limit: number
         </div>
         <div className="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-1 rounded-full shadow-inner">
           <ShieldCheck className="w-3 h-3 text-emerald-400" />
-          <span className="text-[10px] font-extrabold text-emerald-400 uppercase tracking-wider">Verified limit</span>
+          <span className="text-[10px] font-extrabold text-emerald-400 uppercase tracking-wider">Verified Score</span>
         </div>
       </div>
     </div>
@@ -267,7 +267,7 @@ export default function PredictPage() {
             <div className="text-center mb-8">
 
               <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-2">Simulasi Kelayakan</h1>
-              <p className="text-slate-500 dark:text-slate-400 text-base max-w-lg mx-auto">Masukkan rencana pinjaman untuk dianalisis oleh KreditinAja! Engine</p>
+              <p className="text-slate-500 dark:text-slate-400 text-base max-w-lg mx-auto">Masukkan rencana pinjaman untuk dianalisis oleh KreditCerdas AI Engine</p>
             </div>
 
             {/* Info boxes — side by side */}
@@ -286,8 +286,8 @@ export default function PredictPage() {
                   <Zap className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-sm md:text-base font-black text-amber-800 dark:text-amber-400">Persyaratan Nominal dalam USD</p>
-                  <p className="text-xs md:text-sm text-amber-700/70 dark:text-amber-500/50 mt-0.5 leading-relaxed">Model dilatih menggunakan standar dataset Prosper (Amerika Serikat). Masukkan gaji & nominal dalam satuan Dolar (USD). Contoh: Gaji $3,000, Pinjaman $2,000.</p>
+                  <p className="text-sm md:text-base font-black text-amber-800 dark:text-amber-400">Parameter Risiko Prosper (USD)</p>
+                  <p className="text-xs md:text-sm text-amber-700/70 dark:text-amber-500/50 mt-0.5 leading-relaxed">Model penilaian kami diselaraskan dengan pasar Prosper (Amerika Serikat). Masukkan nominal gaji & pinjaman dalam satuan Dolar (USD). Contoh: Gaji $3,000, Pinjaman $2,000.</p>
                 </div>
               </div>
             </div>
@@ -439,17 +439,17 @@ export default function PredictPage() {
                     <span className={`w-1.5 h-1.5 rounded-full ${
                       result.result === 'LAYAK' ? 'bg-emerald-500 animate-ping' : 'bg-rose-500 animate-ping'
                     }`} />
-                    {result.result === 'LAYAK' ? 'Approved Limit Active' : 'Application Unapproved'}
+                    {result.result === 'LAYAK' ? 'Kesiapan Pengajuan Tinggi' : 'Kesiapan Pengajuan Rendah'}
                   </div>
 
                   <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white mb-3 leading-none">
-                    Pengajuan {result.result === 'LAYAK' ? 'Disetujui ✓' : 'Ditolak ✗'}
+                    Rekomendasi Prosper: {result.result === 'LAYAK' ? 'Kategori A/Lancar ✓' : 'Kategori Berisiko ✗'}
                   </h1>
                   
                   <p className="text-slate-500 dark:text-slate-400 text-base font-semibold max-w-lg leading-relaxed">
                     {result.result === 'LAYAK'
-                      ? 'Selamat! Sistem skoring KreditinAja! Engine menyatakan profil Anda memenuhi standar aman untuk mendapatkan fasilitas limit kredit.'
-                      : 'Mohon maaf, saat ini profil kelayakan Anda tidak memenuhi standar manajemen risiko aman pendaftaran kami.'}
+                      ? 'Selamat! Hasil asesmen KreditCerdas menyatakan profil Anda memiliki kesiapan tinggi dan risiko rendah untuk diajukan ke Prosper.'
+                      : 'Berdasarkan analisis KreditCerdas, profil Anda memiliki rasio risiko yang cukup tinggi untuk diajukan ke Prosper saat ini.'}
                   </p>
 
                   {result.catatanRisiko && (
@@ -512,7 +512,7 @@ export default function PredictPage() {
                 {result.result === 'LAYAK' && result.plafon && (
                   <div className="bg-white/80 dark:bg-slate-900/80 border border-slate-200/50 dark:border-slate-800/50 rounded-[28px] p-6 md:p-8 shadow-md flex-1">
                     <h3 className="text-base font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 mb-5 uppercase tracking-widest">
-                      <Banknote className="w-5 h-5" /> Rencana Pembayaran & Tagihan
+                      <Banknote className="w-5 h-5" /> Simulasi & Rekomendasi Prosper
                     </h3>
                     
                     {/* Nominal and Term Pill Cards — 3 columns */}

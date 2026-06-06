@@ -79,8 +79,8 @@ export default function Home() {
       initials: 'JS',
       gradient: 'from-amber-400 to-orange-500',
       rating: 5,
-      title: 'Modal Usaha Cair Kilat!',
-      comment: 'KreditinAja! benar-benar menyelamatkan bisnis kedai kopi saya saat butuh perputaran modal mendesak. Proses scoring AI berjalan super cepat, hanya 3 menit langsung keluar rekomendasi limit. Sangat efisien!'
+      title: 'Pendanaan Prosper Sukses!',
+      comment: 'KreditCerdas sangat membantu saya menganalisis profil risiko sebelum mengajukan ke Prosper. Dengan sertifikasi skor yang terpercaya, pengajuan saya langsung dilirik dan didanai investor Prosper dengan cepat!'
     },
     {
       name: 'Siti Aminah',
@@ -89,8 +89,8 @@ export default function Home() {
       initials: 'SA',
       gradient: 'from-teal-400 to-emerald-600',
       rating: 5,
-      title: 'Transparansi Bunga Terbaik',
-      comment: 'Sebelumnya saya ragu dengan platform pinjaman online karena biaya tersembunyi. Namun di KreditinAja!, seluruh rincian bunga anuitas dan estimasi cicilan bulanan ditampilkan secara transparan tanpa ada yang ditutupi.'
+      title: 'Pre-check yang Sangat Membantu',
+      comment: 'Sebelum mengajukan pinjaman di Prosper, saya menggunakan KreditCerdas untuk pre-check. Analisis suku bunga simulasi dan penilaian risikonya sangat transparan, membuat saya lebih percaya diri saat meluncurkan pengajuan.'
     },
     {
       name: 'Budi Hartono',
@@ -99,8 +99,8 @@ export default function Home() {
       initials: 'BH',
       gradient: 'from-sky-400 to-blue-600',
       rating: 5,
-      title: 'Model Underwriting Sangat Akurat',
-      comment: 'Sebagai analis keuangan, saya sangat kagum dengan presisi model scoring underwriting di platform ini. Kombinasi MLOps dan algoritma Gradient Boosting menghasilkan penilaian yang adil dan sesuai dengan profil risiko.'
+      title: 'Saran Optimasi yang Akurat',
+      comment: 'Sebagai analis keuangan, saya kagum dengan presisi model penilaian risiko KreditCerdas. Ini adalah alat konsultasi luar biasa sebelum masuk ke Prosper, membantu nasabah memahami profil kredit mereka secara ilmiah.'
     }
   ];
 
@@ -125,13 +125,13 @@ export default function Home() {
       content: 'SLIK OJK (Sistem Layanan Informasi Keuangan), yang dulunya dikenal sebagai BI Checking, merupakan database historis riwayat kredit nasabah yang dikelola oleh Otoritas Jasa Keuangan. Skor kredit Anda di SLIK OJK terbagi menjadi 5 kolektibilitas: Kolektibilitas 1 (Lancar), Kolektibilitas 2 (Dalam Perhatian Khusus), hingga Kolektibilitas 5 (Macet). Lembaga keuangan akan menolak pengajuan kredit Anda jika skor berada di Kol 3 ke atas. Untuk menjaganya tetap bersih, pastikan Anda melunasi seluruh kewajiban tepat waktu, segera lakukan rekonsiliasi jika terjadi kesalahan administrasi, dan jangan mengajukan terlalu banyak kredit baru dalam waktu bersamaan.'
     },
     {
-      id: 'modal-usaha-kreditinaja',
-      category: 'Ekspansi Bisnis',
+      id: 'modal-usaha-kreditcerdas',
+      category: 'Persiapan Prosper',
       readTime: '5 Menit',
       date: '25 Mei 2026',
-      title: 'Cara Cerdas Menggunakan Layanan KreditinAja! Untuk Mengembangkan Modal Usaha',
-      desc: 'Bagaimana memaksimalkan pencairan limit plafon KreditinAja! untuk akselerasi bisnis UMKM Anda dengan perhitungan ROI yang rasional.',
-      content: 'Bagi pelaku UMKM, modal adalah bahan bakar utama pertumbuhan bisnis. Menggunakan fasilitas kredit secara bijak dapat melipatgandakan omzet jika dialokasikan ke pos yang tepat. Dengan KreditinAja!, Anda dapat memanfaatkan analisis underwriting cepat untuk mencairkan limit plafon kredit usaha. Langkah strategisnya adalah: 1) Hitung Return on Investment (ROI) dari barang modal yang dibeli menggunakan pinjaman. 2) Pastikan proyeksi margin keuntungan bersih lebih besar daripada beban suku bunga kredit. 3) Alokasikan dana pinjaman khusus untuk inventori cepat jual atau peremajaan alat produksi yang langsung mendongkrak omzet harian Anda.'
+      title: 'Cara Cerdas Menggunakan KreditCerdas untuk Mempersiapkan Pinjaman Prosper',
+      desc: 'Bagaimana memaksimalkan skor kelayakan di KreditCerdas agar pengajuan pinjaman UMKM Anda di Prosper cepat dilirik oleh investor global.',
+      content: 'Mendapatkan pendanaan di Prosper memerlukan profil risiko yang meyakinkan bagi para investor. Melalui KreditCerdas, Anda dapat mensimulasikan dan mengoptimalkan skor underwriting sebelum mengajukan pinjaman resmi. Langkah strategisnya adalah: 1) Hitung rasio utang berbanding pendapatan (DTI) Anda melalui simulasi kami. 2) Ikuti rekomendasi AI untuk menyesuaikan nominal pinjaman agar sesuai dengan kapasitas finansial Anda. 3) Publikasikan profil KreditCerdas Anda ke showcase komunitas agar mendapatkan dukungan (vouch) tambahan sebelum Anda mengajukannya secara formal ke platform Prosper.'
     }
   ];
 
@@ -171,28 +171,28 @@ export default function Home() {
               {/* Responsive Header Title */}
               <h1 className="leading-[1.08] mb-6 font-black tracking-tight" style={{ fontSize: 'clamp(2.8rem, 6vw, 5rem)', letterSpacing: '-0.04em' }}>
                 <span className={`block text-sky-950 dark:text-white transition-all duration-700 ${heroRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '150ms' }}>
-                  Solusi Kredit Cepat &
+                  Verifikasi Cerdas Sebelum Meminjam,
                 </span>
                 <span className={`block bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 bg-clip-text text-transparent transition-all duration-700 mt-2 ${heroRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '300ms' }}>
-                  Transparan untuk Anda.
+                  Raih Kepercayaan Investor Lebih Cepat.
                 </span>
               </h1>
 
               {/* Sub-headline description */}
               <p className={`text-lg md:text-xl font-medium text-sky-950/70 dark:text-sky-200/80 max-w-xl mb-8 transition-all duration-700 leading-relaxed ${heroRevealed ? 'opacity-100' : 'opacity-0'}`}
                 style={{ transitionDelay: '450ms' }}>
-                KreditinAja! menggunakan sistem skoring otomatis dan <strong className="text-sky-600 dark:text-sky-400 font-extrabold">analisis berbasis data</strong> untuk menilai kelayakan kredit Anda secara instan, adil, aman, dan tanpa biaya tersembunyi.
+                KreditCerdas membantu Anda menganalisis kelayakan kredit secara instan sebelum mengajukan ke Prosper, membangun profil risiko terverifikasi agar memikat para investor.
               </p>
 
               {/* Floating micro-benefits */}
               <div className={`grid grid-cols-2 gap-x-8 gap-y-4 mb-10 text-sm font-bold text-sky-950 dark:text-sky-200 transition-all duration-700 ${heroRevealed ? 'opacity-100' : 'opacity-0'}`} style={{ transitionDelay: '550ms' }}>
                 <div className="flex items-center gap-2.5">
                   <div className="w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center"><Check className="w-4 h-4 stroke-[3]" /></div>
-                  Analisis Instan 3 Detik
+                  Analisis Kesiapan Prosper
                 </div>
                 <div className="flex items-center gap-2.5">
                   <div className="w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center"><Check className="w-4 h-4 stroke-[3]" /></div>
-                  Akurasi Prediksi 95.7%
+                  Optimasi Skor Risiko
                 </div>
                 <div className="flex items-center gap-2.5">
                   <div className="w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center"><Check className="w-4 h-4 stroke-[3]" /></div>
@@ -200,7 +200,7 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-2.5">
                   <div className="w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center"><Check className="w-4 h-4 stroke-[3]" /></div>
-                  Plafon Maksimal Sesuai Risiko
+                  Rekomendasi Plafon Akurat
                 </div>
               </div>
 
@@ -366,8 +366,8 @@ export default function Home() {
           {/* Header */}
           <div className={`text-center mb-20 transition-all duration-1000 ${benefitsVis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
 
-            <h2 className="text-4xl md:text-5xl font-black text-sky-950 dark:text-sky-100 mb-4 tracking-tight">Kenapa Harus Memilih KreditinAja! ?</h2>
-            <p className="text-sky-700/55 dark:text-sky-300/45 text-base md:text-lg max-w-lg mx-auto">Sistem cerdas berbasis teknologi mutakhir untuk memberikan solusi kredit terbaik dan transparan.</p>
+            <h2 className="text-4xl md:text-5xl font-black text-sky-950 dark:text-sky-100 mb-4 tracking-tight">Kenapa Harus Memilih KreditCerdas?</h2>
+            <p className="text-sky-700/55 dark:text-sky-300/45 text-base md:text-lg max-w-lg mx-auto">Sistem konsultan kredit berbasis machine learning untuk mempersiapkan portofolio pinjaman Prosper Anda.</p>
           </div>
 
           {/* Alternate Asymmetrical Layout */}
@@ -379,12 +379,12 @@ export default function Home() {
                 <div className="w-12 h-12 rounded-2xl bg-sky-500/15 flex items-center justify-center text-sky-500 shadow-inner">
                   <Shield className="w-6 h-6" />
                 </div>
-                <h3 className="text-3xl font-black text-sky-950 dark:text-sky-100 tracking-tight">Keputusan Penilaian Kredit Instan & Otomatis</h3>
+                <h3 className="text-3xl font-black text-sky-950 dark:text-sky-100 tracking-tight">Simulasi & Penilaian Risiko Kredit Instan</h3>
                 <p className="text-sky-700/60 dark:text-sky-300/50 text-base leading-relaxed">
-                  Kami tidak menggunakan metode survei kuno yang memakan waktu berhari-hari. Berkat sistem penilaian terautomatisasi yang terintegrasi, platform kami mampu menganalisis berbagai variabel risiko profil keuangan Anda dan mengeluarkan keputusan limit kredit dalam waktu kurang dari 3 detik secara aman.
+                  Kami menyediakan pre-assessment cepat sebelum Anda masuk ke pasar Prosper. Berkat algoritma machine learning yang andal, platform kami menganalisis kesiapan profil keuangan Anda secara instan, memberikan gambaran rating risiko tepercaya demi meyakinkan investor.
                 </p>
                 <div className="pt-2">
-                  <span className="text-sm font-black text-sky-500 uppercase tracking-widest">Analisis Risiko Kredit Terkomputerisasi</span>
+                  <span className="text-sm font-black text-sky-500 uppercase tracking-widest">Simulasi Penilaian Risiko Terkomputerisasi</span>
                 </div>
               </div>
               <div className="w-full lg:w-1/2 bg-sky-50/50 dark:bg-slate-900/30 border border-sky-100/50 dark:border-sky-800/20 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between h-56 shadow-inner">
@@ -420,7 +420,7 @@ export default function Home() {
                 </div>
                 <h3 className="text-3xl font-black text-sky-950 dark:text-sky-100 tracking-tight">Keamanan Enkripsi Setingkat Perbankan</h3>
                 <p className="text-sky-700/60 dark:text-sky-300/50 text-base leading-relaxed">
-                  Kami sangat menghargai privasi data Anda. KreditinAja! menggunakan protokol enkripsi **256-bit SSL end-to-end** untuk melindungi segala bentuk transmisi informasi pribadi Anda. Seluruh berkas nasabah disimpan dalam server awan terisolasi dengan akses keamanan berlapis sehingga terhindar dari penyalahgunaan.
+                  Kami sangat menghargai privasi data Anda. KreditCerdas menggunakan protokol enkripsi **256-bit SSL end-to-end** untuk melindungi segala bentuk transmisi informasi pribadi Anda. Seluruh berkas nasabah disimpan dalam server awan terisolasi dengan akses keamanan berlapis sehingga terhindar dari penyalahgunaan.
                 </p>
                 <div className="pt-2">
                   <span className="text-sm font-black text-indigo-500 uppercase tracking-widest">ISO 27001 Compliant & Secure</span>
@@ -476,8 +476,8 @@ export default function Home() {
           {/* Header */}
           <div className={`text-center mb-16 transition-all duration-1000 ${testiVis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
 
-            <h2 className="text-4xl md:text-5xl font-black text-sky-950 dark:text-sky-100 mb-4 tracking-tight">Kisah Sukses Mitra KreditinAja!</h2>
-            <p className="text-sky-700/55 dark:text-sky-300/45 text-base md:text-lg max-w-lg mx-auto">Dengarkan ulasan langsung dari nasabah yang telah terbantu kebutuhan modal dan pinjamannya.</p>
+            <h2 className="text-4xl md:text-5xl font-black text-sky-950 dark:text-sky-100 mb-4 tracking-tight">Kisah Sukses Pengguna KreditCerdas</h2>
+            <p className="text-sky-700/55 dark:text-sky-300/45 text-base md:text-lg max-w-lg mx-auto">Dengarkan ulasan langsung dari mereka yang sukses mendapatkan pendanaan investor di Prosper.</p>
           </div>
 
           {/* Testimonial Cards Layout */}
