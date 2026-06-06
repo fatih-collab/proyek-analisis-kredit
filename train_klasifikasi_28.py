@@ -86,12 +86,24 @@ preprocessor = ColumnTransformer([
     ('cat', cat_tr, cat_cols)
 ], remainder='drop')
 
+# ── 5. Build Pipeline with Hyperparameter Tuning ──────────────────────
+best_params = {}
+if os.path.exists("best_params.pkl"):
+    print("Loading hyperparameter tuning results (best_params.pkl)...")
+    best_params = joblib.load("best_params.pkl")
+    print(f"Found best parameters: {best_params}")
+else:
+    print("No best_params.pkl found. Using default LightGBM parameters...")
+    best_params = {
+        'boosting_type': 'gbdt',
+        'learning_rate': 0.05,
+        'n_estimators': 400
+    }
+
 pipe_klasifikasi = Pipeline([
     ('preprocessor', preprocessor),
     ('model',        LGBMClassifier(
-        boosting_type='gbdt',
-        learning_rate=0.05,
-        n_estimators=400,
+        **best_params,
         random_state=42,
         n_jobs=-1,
         verbose=-1
