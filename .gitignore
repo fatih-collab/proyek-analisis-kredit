@@ -1,0 +1,31 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Caches and logs
+backend/prediction_logs.json
+*.log
+
+# Large Datasets
+Dataset/
+*.csv
+
+# Models
+*.pkl
+
+# Next.js / Node
+node_modules/
+.next/
+out/
+build/
+.vercel/
+
+# MLflow
+mlruns/
+mlartifacts/
+mlflow.db
+
+# Other caches
+catboost_info/
+.dvc/

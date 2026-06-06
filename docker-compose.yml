@@ -1,0 +1,33 @@
+# ═══════════════════════════════════════════════════════════
+# Docker Compose — PDBL-MLOPS Full Stack
+# ═══════════════════════════════════════════════════════════
+
+services:
+  # ── Frontend (Next.js) ──
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # ── Backend (FastAPI) ──
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount model files from root
+      - ./best_model_regresi2.pkl:/app/../best_model_regresi2.pkl:ro
+      - ./model_tuned_final.pkl:/app/../model_tuned_final.pkl:ro
+      - ./threshold_tuned.pkl:/app/../threshold_tuned.pkl:ro
+      - ./best_params.pkl:/app/../best_params.pkl:ro
+      - ./selected_features.pkl:/app/../selected_features.pkl:ro
+    restart: unless-stopped
