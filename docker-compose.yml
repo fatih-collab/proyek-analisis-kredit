@@ -1,0 +1,27 @@
+# ═══════════════════════════════════════════════════════════
+# Docker Compose — PDBL-MLOPS Full Stack
+# ═══════════════════════════════════════════════════════════
+
+services:
+  # ── Frontend (Next.js) ──
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://backend:8000
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # ── Backend (FastAPI) ──
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
