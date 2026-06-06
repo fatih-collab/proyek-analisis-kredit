@@ -160,6 +160,16 @@ class Predictor:
     def __init__(self):
         self.models_loaded = False
         self.medians = dict(DEFAULT_MEDIANS)
+        # Suku bunga fallback default (median BorrowerRate dari dataset Prosper)
+        self.rating_rates = {
+            7.0: 0.0779,
+            6.0: 0.1119,
+            5.0: 0.1509,
+            4.0: 0.1914,
+            3.0: 0.2492,
+            2.0: 0.2925,
+            1.0: 0.3177
+        }
         self._load_models()
         self._try_compute_medians_from_csv()
 
@@ -241,6 +251,15 @@ class Predictor:
                 if len(mode_val) > 0:
                     self.medians["IsBorrowerHomeowner"] = bool(mode_val.iloc[0])
 
+            # Hitung median BorrowerRate dinamis berdasarkan ProsperRating (numeric) dari dataset
+            if "ProsperRating (numeric)" in df.columns and "BorrowerRate" in df.columns:
+                print("[INFO] Menghitung median suku bunga berdasarkan rating risk dari dataset...")
+                rate_medians = df.groupby("ProsperRating (numeric)")["BorrowerRate"].median().to_dict()
+                for rating, rate in rate_medians.items():
+                    r_key = float(round(rating))
+                    if r_key in [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0]:
+                        self.rating_rates[r_key] = float(rate)
+
             print(f"[OK] Median dihitung dari {len(df):,} baris dataset")
 
         except Exception as e:
@@ -309,7 +328,7 @@ class Predictor:
 
         # ── E. HITUNG CICILAN ANUITAS ─────────────────────────────────
         tenor = user["tenor"]
-        bunga = self._get_interest_rate(tenor)
+        bunga = self._get_interest_rate_by_risk(proba)
         nominal_final = nominal
 
         bunga_per_bulan = bunga / 12
@@ -467,6 +486,27 @@ class Predictor:
             return 0.15   # 15% per tahun
         else:
             return 0.22   # 22% per tahun
+
+    def _get_interest_rate_by_risk(self, proba: float) -> float:
+        """Suku bunga tahunan dinamis berdasarkan probabilitas kelayakan nasabah (Risk-Based Pricing)."""
+        # Rentang probabilitas kelayakan dibagi menjadi 7 tier (makin besar proba, rating makin besar, bunga makin murah)
+        if proba >= 0.90:
+            rating = 7.0  # Sangat aman (AA)
+        elif proba >= 0.80:
+            rating = 6.0  # Aman (A)
+        elif proba >= 0.70:
+            rating = 5.0  # Layak Atas (B)
+        elif proba >= 0.60:
+            rating = 4.0  # Layak Menengah (C)
+        elif proba >= 0.50:
+            rating = 3.0  # Cukup Berisiko (D)
+        elif proba >= 0.40:
+            rating = 2.0  # Berisiko (E)
+        else:
+            rating = 1.0  # Sangat Berisiko (HR)
+            
+        # Ambil rate dari dictionary rating_rates yang dihitung dari dataset
+        return self.rating_rates.get(rating, 0.1914)  # default C (19.14%)
 
     # ------------------------------------------------------------------
     # PRIVATE: Alasan Penolakan
