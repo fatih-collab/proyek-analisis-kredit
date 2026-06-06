@@ -38,9 +38,9 @@ if sys.stdout.encoding != 'utf-8':
 # ══════════════════════════════════════════════════════════════════════════
 
 BASE_DIR   = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MODEL_KLAS = os.path.join(BASE_DIR, "model_tuned_final.pkl")
+MODEL_KLAS = os.path.join(BASE_DIR, "model_klasifikasi_loan.pkl")
 MODEL_THR  = os.path.join(BASE_DIR, "threshold_tuned.pkl")
-MODEL_REG  = os.path.join(BASE_DIR, "best_model_regresi2.pkl")
+MODEL_REG  = os.path.join(BASE_DIR, "model_regresi_tuned_loan.pkl")
 DATASET_CSV = os.path.join(BASE_DIR, "Dataset", "CLEANN_prosperloandata (1).csv")
 if not os.path.exists(DATASET_CSV):
     DATASET_CSV = os.path.join(BASE_DIR, "Dataset", "prosperLoanData.csv")
