@@ -4,10 +4,16 @@ Jalankan: python main.py
 Docs    : http://localhost:8000/docs
 """
 import sys
+import os
+
+# Tambahkan direktori backend ke sys.path agar modul lokal (schemas, admin_schemas) bisa di-import langsung
+backend_dir = os.path.dirname(os.path.abspath(__file__))
+if backend_dir not in sys.path:
+    sys.path.insert(0, backend_dir)
+
 if sys.stdout.encoding != 'utf-8':
     sys.stdout.reconfigure(encoding='utf-8')
 
-import os
 import json
 import time
 from datetime import datetime
@@ -30,10 +36,11 @@ ADMIN_EMAIL = "admin@kreditinaja.id"
 ADMIN_PASSWORD = "admin123"
 
 # ── Paths ─────────────────────────────────────────────────────────────────
+BASE_DIR = os.path.dirname(backend_dir)
 DATASET_PATH = os.path.join(BASE_DIR, "Dataset", "CLEANN_prosperloandata (1).csv")
 if not os.path.exists(DATASET_PATH):
     DATASET_PATH = os.path.join(BASE_DIR, "Dataset", "prosperLoanData.csv")
-PREDICTION_LOG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "prediction_logs.json")
+PREDICTION_LOG_PATH = os.path.join(backend_dir, "prediction_logs.json")
 
 # ── Active admin tokens (in-memory store) ─────────────────────────────────
 active_admin_tokens: set = set()
