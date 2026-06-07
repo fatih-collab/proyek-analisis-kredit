@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "dev:admin": "next dev --port 3001",
+    "dev:admin": "ENABLE_ADMIN=true next dev --port 3001",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
