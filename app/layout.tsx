@@ -3,7 +3,7 @@ import "./globals.css";
 import { AuthProvider } from "./context/AuthContext";
 
 export const metadata: Metadata = {
-  title: "KreditCerdas — Konsultan & Verifikasi Kredit Pra-Prosper",
+  title: "CreditCare — Konsultan & Verifikasi Kredit Pra-Prosper",
   description: "Optimalkan profil risiko Anda dan dapatkan analisis kelayakan kredit sebelum mengajukan pinjaman ke platform Prosper untuk meyakinkan investor.",
 };
 

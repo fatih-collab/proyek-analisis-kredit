@@ -91,14 +91,14 @@ export default function AdminSidebar({
     <div className="flex flex-col h-full overflow-hidden select-none">
       {/* Logo: Blue Card CreditCard exactly like homepage */}
       <div className={`py-5 border-b border-sky-100/30 dark:border-sky-800/20 transition-all ${isCollapsed ? 'px-2 flex justify-center' : 'px-5'}`}>
-        <Link href="/admin" className={`flex items-center group ${isCollapsed ? 'justify-center' : 'gap-2.5'}`} title={isCollapsed ? "KreditCerdas Admin" : undefined}>
+        <Link href="/admin" className={`flex items-center group ${isCollapsed ? 'justify-center' : 'gap-2.5'}`} title={isCollapsed ? "CreditCare Admin" : undefined}>
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-400 to-indigo-600 flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-300" style={{ boxShadow: '0 4px 12px rgba(14,165,233,0.3)' }}>
             <CreditCard className="w-5 h-5 text-white" />
           </div>
           {!isCollapsed && (
             <div className="animate-fade-in">
               <span className="text-sm font-black text-sky-900 dark:text-sky-100" style={{ letterSpacing: '-0.03em' }}>
-                Kredit<span className="bg-gradient-to-r from-sky-400 to-indigo-600 bg-clip-text text-transparent ml-0.5">Cerdas</span>
+                Credit<span className="bg-gradient-to-r from-sky-400 to-indigo-600 bg-clip-text text-transparent ml-0.5">Care</span>
               </span>
               <p className="text-[9px] font-bold text-sky-400/50 uppercase tracking-wider">Admin Panel</p>
             </div>

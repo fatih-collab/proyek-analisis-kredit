@@ -80,7 +80,7 @@ export default function Home() {
       gradient: 'from-amber-400 to-orange-500',
       rating: 5,
       title: 'Pendanaan Prosper Sukses!',
-      comment: 'KreditCerdas sangat membantu saya menganalisis profil risiko sebelum mengajukan ke Prosper. Dengan sertifikasi skor yang terpercaya, pengajuan saya langsung dilirik dan didanai investor Prosper dengan cepat!'
+      comment: 'CreditCare sangat membantu saya menganalisis profil risiko sebelum mengajukan ke Prosper. Dengan sertifikasi skor yang terpercaya, pengajuan saya langsung dilirik dan didanai investor Prosper dengan cepat!'
     },
     {
       name: 'Siti Aminah',
@@ -90,7 +90,7 @@ export default function Home() {
       gradient: 'from-teal-400 to-emerald-600',
       rating: 5,
       title: 'Pre-check yang Sangat Membantu',
-      comment: 'Sebelum mengajukan pinjaman di Prosper, saya menggunakan KreditCerdas untuk pre-check. Analisis suku bunga simulasi dan penilaian risikonya sangat transparan, membuat saya lebih percaya diri saat meluncurkan pengajuan.'
+      comment: 'Sebelum mengajukan pinjaman di Prosper, saya menggunakan CreditCare untuk pre-check. Analisis suku bunga simulasi dan penilaian risikonya sangat transparan, membuat saya lebih percaya diri saat meluncurkan pengajuan.'
     },
     {
       name: 'Budi Hartono',
@@ -100,7 +100,7 @@ export default function Home() {
       gradient: 'from-sky-400 to-blue-600',
       rating: 5,
       title: 'Saran Optimasi yang Akurat',
-      comment: 'Sebagai analis keuangan, saya kagum dengan presisi model penilaian risiko KreditCerdas. Ini adalah alat konsultasi luar biasa sebelum masuk ke Prosper, membantu nasabah memahami profil kredit mereka secara ilmiah.'
+      comment: 'Sebagai analis keuangan, saya kagum dengan presisi model penilaian risiko CreditCare. Ini adalah alat konsultasi luar biasa sebelum masuk ke Prosper, membantu nasabah memahami profil kredit mereka secara ilmiah.'
     }
   ];
 
@@ -125,13 +125,13 @@ export default function Home() {
       content: 'SLIK OJK (Sistem Layanan Informasi Keuangan), yang dulunya dikenal sebagai BI Checking, merupakan database historis riwayat kredit nasabah yang dikelola oleh Otoritas Jasa Keuangan. Skor kredit Anda di SLIK OJK terbagi menjadi 5 kolektibilitas: Kolektibilitas 1 (Lancar), Kolektibilitas 2 (Dalam Perhatian Khusus), hingga Kolektibilitas 5 (Macet). Lembaga keuangan akan menolak pengajuan kredit Anda jika skor berada di Kol 3 ke atas. Untuk menjaganya tetap bersih, pastikan Anda melunasi seluruh kewajiban tepat waktu, segera lakukan rekonsiliasi jika terjadi kesalahan administrasi, dan jangan mengajukan terlalu banyak kredit baru dalam waktu bersamaan.'
     },
     {
-      id: 'modal-usaha-kreditcerdas',
+      id: 'modal-usaha-creditcare',
       category: 'Persiapan Prosper',
       readTime: '5 Menit',
       date: '25 Mei 2026',
-      title: 'Cara Cerdas Menggunakan KreditCerdas untuk Mempersiapkan Pinjaman Prosper',
-      desc: 'Bagaimana memaksimalkan skor kelayakan di KreditCerdas agar pengajuan pinjaman UMKM Anda di Prosper cepat dilirik oleh investor global.',
-      content: 'Mendapatkan pendanaan di Prosper memerlukan profil risiko yang meyakinkan bagi para investor. Melalui KreditCerdas, Anda dapat mensimulasikan dan mengoptimalkan skor underwriting sebelum mengajukan pinjaman resmi. Langkah strategisnya adalah: 1) Hitung rasio utang berbanding pendapatan (DTI) Anda melalui simulasi kami. 2) Ikuti rekomendasi AI untuk menyesuaikan nominal pinjaman agar sesuai dengan kapasitas finansial Anda. 3) Publikasikan profil KreditCerdas Anda ke showcase komunitas agar mendapatkan dukungan (vouch) tambahan sebelum Anda mengajukannya secara formal ke platform Prosper.'
+      title: 'Cara Cerdas Menggunakan CreditCare untuk Mempersiapkan Pinjaman Prosper',
+      desc: 'Bagaimana memaksimalkan skor kelayakan di CreditCare agar pengajuan pinjaman UMKM Anda di Prosper cepat dilirik oleh investor global.',
+      content: 'Mendapatkan pendanaan di Prosper memerlukan profil risiko yang meyakinkan bagi para investor. Melalui CreditCare, Anda dapat mensimulasikan dan mengoptimalkan skor underwriting sebelum mengajukan pinjaman resmi. Langkah strategisnya adalah: 1) Hitung rasio utang berbanding pendapatan (DTI) Anda melalui simulasi kami. 2) Ikuti rekomendasi AI untuk menyesuaikan nominal pinjaman agar sesuai dengan kapasitas finansial Anda. 3) Publikasikan profil CreditCare Anda ke showcase komunitas agar mendapatkan dukungan (vouch) tambahan sebelum Anda mengajukannya secara formal ke platform Prosper.'
     }
   ];
 
@@ -181,7 +181,7 @@ export default function Home() {
               {/* Sub-headline description */}
               <p className={`text-lg md:text-xl font-medium text-sky-950/70 dark:text-sky-200/80 max-w-xl mb-8 transition-all duration-700 leading-relaxed ${heroRevealed ? 'opacity-100' : 'opacity-0'}`}
                 style={{ transitionDelay: '450ms' }}>
-                KreditCerdas membantu Anda menganalisis kelayakan kredit secara instan sebelum mengajukan ke Prosper, membangun profil risiko terverifikasi agar memikat para investor.
+                CreditCare membantu Anda menganalisis kelayakan kredit secara instan sebelum mengajukan ke Prosper, membangun profil risiko terverifikasi agar memikat para investor.
               </p>
 
               {/* Floating micro-benefits */}
@@ -366,7 +366,7 @@ export default function Home() {
           {/* Header */}
           <div className={`text-center mb-20 transition-all duration-1000 ${benefitsVis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
 
-            <h2 className="text-4xl md:text-5xl font-black text-sky-950 dark:text-sky-100 mb-4 tracking-tight">Kenapa Harus Memilih KreditCerdas?</h2>
+            <h2 className="text-4xl md:text-5xl font-black text-sky-950 dark:text-sky-100 mb-4 tracking-tight">Kenapa Harus Memilih CreditCare?</h2>
             <p className="text-sky-700/55 dark:text-sky-300/45 text-base md:text-lg max-w-lg mx-auto">Sistem konsultan kredit berbasis machine learning untuk mempersiapkan portofolio pinjaman Prosper Anda.</p>
           </div>
 
@@ -420,7 +420,7 @@ export default function Home() {
                 </div>
                 <h3 className="text-3xl font-black text-sky-950 dark:text-sky-100 tracking-tight">Keamanan Enkripsi Setingkat Perbankan</h3>
                 <p className="text-sky-700/60 dark:text-sky-300/50 text-base leading-relaxed">
-                  Kami sangat menghargai privasi data Anda. KreditCerdas menggunakan protokol enkripsi **256-bit SSL end-to-end** untuk melindungi segala bentuk transmisi informasi pribadi Anda. Seluruh berkas nasabah disimpan dalam server awan terisolasi dengan akses keamanan berlapis sehingga terhindar dari penyalahgunaan.
+                  Kami sangat menghargai privasi data Anda. CreditCare menggunakan protokol enkripsi **256-bit SSL end-to-end** untuk melindungi segala bentuk transmisi informasi pribadi Anda. Seluruh berkas nasabah disimpan dalam server awan terisolasi dengan akses keamanan berlapis sehingga terhindar dari penyalahgunaan.
                 </p>
                 <div className="pt-2">
                   <span className="text-sm font-black text-indigo-500 uppercase tracking-widest">ISO 27001 Compliant & Secure</span>
@@ -476,7 +476,7 @@ export default function Home() {
           {/* Header */}
           <div className={`text-center mb-16 transition-all duration-1000 ${testiVis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
 
-            <h2 className="text-4xl md:text-5xl font-black text-sky-950 dark:text-sky-100 mb-4 tracking-tight">Kisah Sukses Pengguna KreditCerdas</h2>
+            <h2 className="text-4xl md:text-5xl font-black text-sky-950 dark:text-sky-100 mb-4 tracking-tight">Kisah Sukses Pengguna CreditCare</h2>
             <p className="text-sky-700/55 dark:text-sky-300/45 text-base md:text-lg max-w-lg mx-auto">Dengarkan ulasan langsung dari mereka yang sukses mendapatkan pendanaan investor di Prosper.</p>
           </div>
 

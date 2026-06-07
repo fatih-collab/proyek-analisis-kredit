@@ -102,7 +102,7 @@ function CreditCardMockup({ userName, limit }: { userName: string; limit: number
         <div className="text-right">
           <div className="flex items-center gap-1.5 justify-end">
             <CreditCard className="w-4 h-4 text-sky-400" />
-            <span className="text-xs font-black tracking-[0.1em] text-slate-200 uppercase">KreditCerdas</span>
+            <span className="text-xs font-black tracking-[0.1em] text-slate-200 uppercase">CreditCare</span>
           </div>
           <span className="text-[9px] font-bold text-sky-400/60 uppercase tracking-widest">Premium Active</span>
         </div>
@@ -267,7 +267,7 @@ export default function PredictPage() {
             <div className="text-center mb-8">
 
               <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-2">Simulasi Kelayakan</h1>
-              <p className="text-slate-500 dark:text-slate-400 text-base max-w-lg mx-auto">Masukkan rencana pinjaman untuk dianalisis oleh KreditCerdas AI Engine</p>
+              <p className="text-slate-500 dark:text-slate-400 text-base max-w-lg mx-auto">Masukkan rencana pinjaman untuk dianalisis oleh CreditCare AI Engine</p>
             </div>
 
             {/* Info boxes — side by side */}
@@ -448,8 +448,8 @@ export default function PredictPage() {
                   
                   <p className="text-slate-500 dark:text-slate-400 text-base font-semibold max-w-lg leading-relaxed">
                     {result.result === 'LAYAK'
-                      ? 'Selamat! Hasil asesmen KreditCerdas menyatakan profil Anda memiliki kesiapan tinggi dan risiko rendah untuk diajukan ke Prosper.'
-                      : 'Berdasarkan analisis KreditCerdas, profil Anda memiliki rasio risiko yang cukup tinggi untuk diajukan ke Prosper saat ini.'}
+                      ? 'Selamat! Hasil asesmen CreditCare menyatakan profil Anda memiliki kesiapan tinggi dan risiko rendah untuk diajukan ke Prosper.'
+                      : 'Berdasarkan analisis CreditCare, profil Anda memiliki rasio risiko yang cukup tinggi untuk diajukan ke Prosper saat ini.'}
                   </p>
 
                   {result.catatanRisiko && (
