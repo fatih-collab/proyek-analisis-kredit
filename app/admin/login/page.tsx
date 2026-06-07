@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Shield, Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
-const BACKEND_URL = 'http://localhost:8000';
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export default function AdminLoginPage() {
   const router = useRouter();

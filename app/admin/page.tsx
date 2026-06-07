@@ -11,7 +11,7 @@ import AdminSidebar from './components/AdminSidebar';
 import DataTable from './components/DataTable';
 import { PieChart, BarChart, LineChart, HistogramChart } from './components/EDACharts';
 
-const BACKEND_URL = 'http://localhost:8000';
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 /* ─── Types ─── */
 interface EDAData {
@@ -210,7 +210,7 @@ export default function AdminDashboard() {
         setPredictions(predData.predictions || []);
       }
     } catch {
-      setError('Gagal terhubung ke backend. Pastikan server berjalan di localhost:8000');
+      setError('Gagal terhubung ke backend. Pastikan server backend berjalan.');
     }
     setIsLoading(false);
   };

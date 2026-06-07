@@ -189,7 +189,8 @@ export default function PredictPage() {
         address: user?.profile?.address || '',
       };
 
-      const response = await fetch('http://localhost:8000/predict', {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${API_URL}/predict`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -238,7 +239,7 @@ export default function PredictPage() {
       clearInterval(msgInterval);
       clearInterval(progInterval);
       const errorMsg = err instanceof Error ? err.message : 'Tidak dapat terhubung ke server backend.';
-      alert(`❌ Error: ${errorMsg}\n\nPastikan backend FastAPI berjalan di http://localhost:8000`);
+      alert(`❌ Error: ${errorMsg}\n\nPastikan backend API dapat dijangkau.`);
       setStep('form');
       setLoadingProgress(0);
     }

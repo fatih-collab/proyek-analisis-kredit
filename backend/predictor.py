@@ -38,9 +38,27 @@ if sys.stdout.encoding != 'utf-8':
 # ══════════════════════════════════════════════════════════════════════════
 
 BASE_DIR   = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MODEL_KLAS = os.path.join(BASE_DIR, "model_klasifikasi_loan.pkl")
-MODEL_THR  = os.path.join(BASE_DIR, "threshold_tuned.pkl")
-MODEL_REG  = os.path.join(BASE_DIR, "model_regresi_tuned_loan.pkl")
+
+def _find_model(filename: str) -> str:
+    """Cari file model di beberapa lokasi (Docker /app/models/, parent dir, current dir)."""
+    candidates = [
+        os.path.join("/app/models", filename),              # Docker container
+        os.path.join(BASE_DIR, filename),                    # Local dev (parent dir)
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), filename),  # Same dir
+    ]
+    for path in candidates:
+        if os.path.exists(path):
+            print(f"[OK] Model ditemukan: {path}")
+            return path
+    # Fallback ke parent dir path (akan raise FileNotFoundError saat load)
+    print(f"[WARN] Model tidak ditemukan di semua lokasi: {filename}")
+    return os.path.join(BASE_DIR, filename)
+
+MODEL_KLAS = _find_model("model_klasifikasi_loan.pkl")
+MODEL_THR  = _find_model("threshold_tuned.pkl")
+MODEL_REG  = _find_model("model_regresi_tuned_loan.pkl")
+
+# Dataset CSV — opsional, untuk median computation
 DATASET_CSV = os.path.join(BASE_DIR, "Dataset", "CLEANN_prosperloandata (1).csv")
 if not os.path.exists(DATASET_CSV):
     DATASET_CSV = os.path.join(BASE_DIR, "Dataset", "prosperLoanData.csv")

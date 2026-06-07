@@ -1,6 +1,10 @@
-# ═══════════════════════════════════════════════════════════
-# Docker Compose — PDBL-MLOPS Full Stack
-# ═══════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════════════════════
+# Docker Compose — PDBL-MLOPS Full Stack (Development & Local Testing)
+#
+# CATATAN: Railway TIDAK menggunakan docker-compose.yml.
+# File ini hanya untuk pengembangan lokal & testing.
+# Di Railway, setiap service di-deploy terpisah via Dockerfile.
+# ═══════════════════════════════════════════════════════════════════════
 
 services:
   # ── Frontend (Next.js) ──
@@ -8,11 +12,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://backend:8000
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=http://backend:8000
+      - PORT=3000
     depends_on:
       - backend
     restart: unless-stopped
@@ -20,15 +26,11 @@ services:
   # ── Backend (FastAPI) ──
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: backend/Dockerfile
     ports:
       - "8000:8000"
-    volumes:
-      # Mount model files from root
-      - ./best_model_regresi2.pkl:/app/../best_model_regresi2.pkl:ro
-      - ./model_tuned_final.pkl:/app/../model_tuned_final.pkl:ro
-      - ./threshold_tuned.pkl:/app/../threshold_tuned.pkl:ro
-      - ./best_params.pkl:/app/../best_params.pkl:ro
-      - ./selected_features.pkl:/app/../selected_features.pkl:ro
+    environment:
+      - PORT=8000
+      - CORS_ORIGINS=http://localhost:3000,http://frontend:3000
     restart: unless-stopped

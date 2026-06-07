@@ -59,15 +59,20 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# ── CORS — izinkan request dari Next.js dev server ────────────────────────
+# ── CORS — izinkan request dari frontend (dev & production) ───────────────
+_default_origins = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:3001",
+]
+_env_origins = os.environ.get("CORS_ORIGINS", "")
+if _env_origins:
+    _default_origins.extend([o.strip() for o in _env_origins.split(",") if o.strip()])
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:3001",
-    ],
+    allow_origins=_default_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -286,12 +291,12 @@ def root():
         "app"      : "PDBL-MLOPS Loan Prediction API",
         "status"   : "running",
         "endpoints": {
-            "docs"        : "http://localhost:8000/docs",
-            "health"      : "http://localhost:8000/health",
-            "predict"     : "POST http://localhost:8000/predict",
-            "admin_login" : "POST http://localhost:8000/admin/login",
-            "admin_eda"   : "GET http://localhost:8000/admin/eda",
-            "admin_preds" : "GET http://localhost:8000/admin/predictions",
+            "docs"        : "/docs",
+            "health"      : "/health",
+            "predict"     : "POST /predict",
+            "admin_login" : "POST /admin/login",
+            "admin_eda"   : "GET /admin/eda",
+            "admin_preds" : "GET /admin/predictions",
         }
     }
 
@@ -503,9 +508,10 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"[WARN] Gagal pre-compute EDA: {e}")
 
+    port = int(os.environ.get("PORT", 8000))
     uvicorn.run(
         "main:app",
         host="0.0.0.0",
-        port=8000,
-        reload=True,
+        port=port,
+        reload=os.environ.get("RAILWAY_ENVIRONMENT") is None,
     )

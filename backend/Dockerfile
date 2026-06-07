@@ -1,6 +1,7 @@
-# ═══════════════════════════════════════════════════════════
-# Dockerfile — FastAPI Backend
-# ═══════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════════════════════
+# Dockerfile — FastAPI Backend (Railway-compatible)
+# Build dari ROOT context: docker build -t pdbl-backend -f backend/Dockerfile .
+# ═══════════════════════════════════════════════════════════════════════
 
 FROM python:3.11-slim
 
@@ -12,15 +13,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first (cache layer)
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy backend code
-COPY . .
+COPY backend/ .
 
-# Copy model files from parent directory (during docker-compose build)
-# Note: model .pkl files should be copied via docker-compose volume or build context
+# Copy model files dari root ke /app/models/
+RUN mkdir -p /app/models
+COPY model_klasifikasi_loan.pkl /app/models/
+COPY model_regresi_tuned_loan.pkl /app/models/
+COPY threshold_tuned.pkl /app/models/
 
-EXPOSE 8000
+# Railway sets PORT env var automatically
+ENV PORT=8000
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+EXPOSE ${PORT}
+
+# Gunakan shell form agar $PORT ter-expand saat runtime
+CMD uvicorn main:app --host 0.0.0.0 --port $PORT
