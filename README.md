@@ -1,113 +1,100 @@
-CreditCare - MLOps Loan Predictor & Credit Risk System
+# CreditCare - Sistem Prediksi Kelayakan & Limit Kredit (MLOps)
 
-Aplikasi web full-stack untuk prediksi kelayakan kredit (*Credit Scoring*) dan penentuan batas aman pinjaman (*Plafon Limit*) berbasis Machine Learning. Proyek ini dibangun menggunakan arsitektur MLOps modern yang dapat dideploy secara kontainerisasi.
+Proyek ini adalah sistem analisis kelayakan kredit (Credit Scoring) dan penentuan batas plafon kredit maksimal berbasis Machine Learning. Aplikasi dibangun dengan Next.js pada frontend, FastAPI pada backend, dan database Supabase (PostgreSQL).
 
----
+## Fitur Utama
+- **Filter Kelayakan Kredit**: Menentukan status kelayakan nasabah (LAYAK / TIDAK LAYAK) menggunakan model klasifikasi LightGBM (Tuned Threshold: 0.52).
+- **Prediksi Plafon Limit**: Menghitung limit kredit maksimal aman untuk nasabah menggunakan model regresi LightGBM.
+- **Explainable Rejection**: Penolakan otomatis dengan penjelasan rasional apabila nominal pengajuan melebihi plafon limit.
+- **Monitoring Panel (Admin)**: Visualisasi data EDA historis dan monitoring log aktivitas pengajuan secara real-time.
+- **Personal Dashboard (User)**: Halaman histori personal untuk memantau ringkasan hasil pengajuan kredit nasabah.
 
-Fitur Utama
-- **Klasifikasi Risiko Kredit**: Memprediksi kelayakan nasabah (*LAYAK / TIDAK LAYAK*) menggunakan LightGBM Classifier dengan threshold optimal **0.5200**.
-- **Regresi Plafon Kredit**: Menentukan batas maksimal limit pinjaman (*Plafon*) menggunakan LightGBM Regressor.
-- **Explainable AI (XAI)**: Sistem otomatis penolakan jika nominal pengajuan melampaui plafon limit aman.
-- **Dashboard Admin & Monitoring**: Panel visualisasi EDA dan log hasil prediksi dari database secara real-time.
-- **Personal User Dashboard**: Histori riwayat prediksi dan ringkasan data kelayakan nasabah secara individual.
-
----
-
-Tech Stack
-- **Frontend**: Next.js (React + TypeScript + TailwindCSS)
-- **Backend**: FastAPI (Python 3.12 + Scikit-Learn + LightGBM)
-- **Database**: Supabase / PostgreSQL (Cloud Database)
-- **Containerization**: Docker & Docker Compose
-- **Hosting / Deployment**: Railway
+## Tech Stack
+- **Frontend**: Next.js (TypeScript, Tailwind CSS)
+- **Backend**: FastAPI (Python)
+- **Database**: Supabase (PostgreSQL)
+- **Kontainer**: Docker & Docker Compose
+- **Hosting**: Railway
 
 ---
 
-Panduan Instalasi 
+## Cara Menjalankan Aplikasi Secara Lokal
 
-### 1. Klon Repositori & Pindah ke Branch `beta`
+Pastikan perangkat Anda sudah terpasang **Python 3.10+**, **Node.js 18+**, dan **Docker Desktop** (jika ingin menggunakan Docker).
+
+### 1. Clone Repositori
 ```bash
 git clone https://github.com/fatih-collab/proyek-analisis-kredit.git
 cd proyek-analisis-kredit
 git checkout beta
 ```
 
----
-
-### 2. Cara Menjalankan Backend (FastAPI)
-
-1. **Masuk ke folder backend & buat virtual environment:**
+### 2. Jalankan Backend (FastAPI)
+1. Pindah ke direktori backend dan buat virtual environment:
    ```bash
    cd backend
    python -m venv venv
    ```
-2. **Aktifkan virtual environment:**
-   - **Windows (PowerShell):**
+2. Aktifkan virtual environment:
+   - **Windows (PowerShell)**:
      ```powershell
      .\venv\Scripts\Activate.ps1
      ```
-   - **macOS/Linux:**
+   - **Mac/Linux**:
      ```bash
      source venv/bin/activate
      ```
-3. **Instal seluruh dependensi Python:**
+3. Install seluruh library Python yang dibutuhkan:
    ```bash
    pip install -r requirements.txt
    ```
-4. **Pembersihan Dataset Lokal (Opsional)**:
-   Jika Anda memiliki file dataset `.csv` lokal dan ingin membersihkan baris `"Not displayed"` secara otomatis:
+4. Bersihkan data non-standar pada dataset lokal (opsional):
    ```bash
    python clean_dataset.py
    ```
-5. **Jalankan Server FastAPI:**
+5. Jalankan server FastAPI:
    ```bash
    uvicorn main:app --reload --host 0.0.0.0 --port 8000
    ```
-   *API Dokumentasi Swagger dapat diakses di: `http://localhost:8000/docs`*
+   Dokumentasi API otomatis (Swagger) dapat diakses melalui: `http://localhost:8000/docs`
 
----
-
-### 3. Cara Menjalankan Frontend (Next.js)
-
-1. **Buka terminal baru di root folder project:**
+### 3. Jalankan Frontend (Next.js)
+1. Buka terminal baru di root folder proyek, lalu install dependencies:
    ```bash
    npm install
    ```
-2. **Jalankan dev server Next.js:**
+2. Jalankan dev server Next.js:
    ```bash
    npm run dev
    ```
-   *Tampilan antarmuka frontend dapat diakses di: `http://localhost:3000`*
+   Halaman web dapat diakses melalui: `http://localhost:3000`
 
----
-
-### 4. Cara Menjalankan dengan Docker (Rekomendasi Demo)
-
-Untuk demo praktis, Anda bisa menjalankan seluruh layanan (Frontend & Backend) secara bersamaan menggunakan Docker Compose:
-
-1. **Pastikan Docker Desktop sudah aktif.**
-2. **Jalankan perintah build & run:**
+### 4. Jalankan Sekaligus Menggunakan Docker (Rekomendasi Demo)
+Jika ingin menjalankan frontend dan backend secara praktis tanpa install manual:
+1. Pastikan aplikasi Docker Desktop sudah aktif.
+2. Jalankan perintah berikut di root folder:
    ```bash
    docker-compose up --build
    ```
-3. **Akses Layanan:**
-   - Frontend Next.js: `http://localhost:3000`
+3. Akses aplikasi:
+   - Frontend: `http://localhost:3000`
    - Backend API: `http://localhost:8000`
 
 ---
 
-Struktur Folder Utama
+## Struktur Proyek
 ```
 PDBL-MLOPS/
-├── app/                  # Frontend Next.js (React/TypeScript)
-├── backend/              # Backend FastAPI (Python)
-│   ├── clean_dataset.py  # Script helper pembersih dataset
-│   ├── main.py           # Entrypoint server API
-│   ├── predictor.py      # Logika model prediksi kelayakan & plafon
-│   └── requirements.txt  # Dependensi Python
-├── Dataset/              # Folder penyimpanan dataset lokal (large.csv)
-├── Dockerfile            # Dockerfile untuk Next.js Frontend
-├── docker-compose.yml    # Orkestrasi Docker untuk Multi-container
+├── app/                  # Kode sumber frontend Next.js
+├── backend/              # Kode sumber backend FastAPI
+│   ├── clean_dataset.py  # Script pembersih dataset
+│   ├── main.py           # Entrypoint API
+│   ├── predictor.py      # Logika pemanggilan model ML
+│   └── requirements.txt  # Daftar dependensi backend
+├── Dataset/              # Folder dataset lokal
+├── Dockerfile            # Konfigurasi container frontend
+├── docker-compose.yml    # Orkestrasi multi-container
 ├── model_klasifikasi_loan.pkl  # Model Klasifikasi ML
 ├── model_regresi_tuned_loan.pkl # Model Regresi ML
-└── threshold_tuned.pkl         # Threshold optimal hasil tuning
+└── threshold_tuned.pkl         # Nilai threshold klasifikasi
 ```
