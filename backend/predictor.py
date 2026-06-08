@@ -29,12 +29,7 @@ from schemas import PredictInput, PredictOutput
 # PATH KE FILE MODEL (.pkl)
 # ══════════════════════════════════════════════════════════════════════════
 
-<<<<<<< HEAD
-BASE_DIR   = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-=======
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
->>>>>>> 8247c49 (Menyambungkan ke supabase)
 def _find_model(filename: str) -> str:
     """Cari file model di beberapa lokasi."""
     candidates = [
@@ -179,6 +174,11 @@ class Predictor:
         except Exception as e:
             print(f"[ERROR] Gagal load model: {e}")
             self.models_loaded = False
+
+    def reload_models(self):
+        """Memuat ulang model dari disk (dipanggil setelah retraining)."""
+        print("[INFO] Reloading models from disk...")
+        self._load_models()
 
     def _try_compute_medians_from_csv(self):
         if not os.path.exists(DATASET_CSV):

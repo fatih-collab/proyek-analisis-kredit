@@ -20,7 +20,7 @@ import time
 from contextlib import asynccontextmanager
 from datetime import datetime
 
-from fastapi import FastAPI, HTTPException, Depends, Header
+from fastapi import FastAPI, HTTPException, Depends, Header, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from database import init_db, get_db, UserDB, LoanApplication
@@ -346,7 +346,7 @@ def health_check():
 
 
 @app.post("/predict", response_model=PredictOutput, tags=["Prediction"])
-def predict(data: PredictInput):
+def predict(data: PredictInput, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     if predictor is None or not predictor.models_loaded:
         raise HTTPException(
             status_code=503,
@@ -377,6 +377,11 @@ def predict(data: PredictInput):
             "address"        : data.address,
         }
         _save_prediction_to_db(log_entry)
+        
+        # Picu retraining model di background thread agar tidak menghambat response user
+        from mlops_pipeline import retrain_models
+        background_tasks.add_task(retrain_models, db, predictor)
+        
         return result
 
     except RuntimeError as e:
