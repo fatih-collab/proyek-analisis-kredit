@@ -33,4 +33,5 @@ services:
     environment:
       - PORT=8000
       - CORS_ORIGINS=http://localhost:3000,http://frontend:3000
+      - DATABASE_URL=${DATABASE_URL:-sqlite:///./local_fallback.db}
     restart: unless-stopped

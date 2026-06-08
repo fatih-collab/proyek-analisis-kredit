@@ -183,6 +183,7 @@ export default function PredictPage() {
     try {
       const payload = {
         ...form,
+        userId: user?.id || null,
         fullName: user?.profile?.fullName || user?.fullName || '',
         email: user?.profile?.email || user?.email || '',
         phone: user?.profile?.phone || '',

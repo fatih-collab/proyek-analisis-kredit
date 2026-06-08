@@ -15,11 +15,11 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setError('');
     if (!form.email || !form.password) { setError('Email dan password wajib diisi'); return; }
     setLoading(true);
-    const res = login(form.email, form.password);
+    const res = await login(form.email, form.password);
     setLoading(false);
     if (res.success) router.push('/dashboard'); else setError(res.error || 'Login gagal');
   };

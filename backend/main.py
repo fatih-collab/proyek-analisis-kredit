@@ -6,34 +6,37 @@ Docs    : http://localhost:8000/docs
 import sys
 import os
 
-# Tambahkan direktori backend ke sys.path agar modul lokal (schemas, admin_schemas) bisa di-import langsung
+# Tambahkan direktori backend ke sys.path agar modul lokal bisa di-import
 backend_dir = os.path.dirname(os.path.abspath(__file__))
 if backend_dir not in sys.path:
     sys.path.insert(0, backend_dir)
 
-if sys.stdout.encoding != 'utf-8':
-    sys.stdout.reconfigure(encoding='utf-8')
+# PENTING: Jangan panggil sys.stdout.reconfigure di module level —
+# di Docker/Railway stdout tidak selalu bisa di-reconfigure dan akan crash.
+# Cukup set env var PYTHONIOENCODING=utf-8 di Dockerfile (sudah ditambahkan).
 
 import json
 import time
+from contextlib import asynccontextmanager
 from datetime import datetime
 
 from fastapi import FastAPI, HTTPException, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
+from database import init_db, get_db, UserDB, LoanApplication
 from schemas import PredictInput, PredictOutput
 from admin_schemas import (
     AdminLoginRequest, AdminLoginResponse,
     BulkDataRequest, EDAStats,
     DatasetEDAResponse, PredictionLogEntry, PredictionLogsResponse,
 )
-from predictor import Predictor
 import uvicorn
 import pandas as pd
 import numpy as np
 
 # ── Admin credentials ────────────────────────────────────────────────────
-ADMIN_EMAIL = "admin@kreditinaja.id"
-ADMIN_PASSWORD = "admin123"
+ADMIN_EMAIL    = os.environ.get("ADMIN_EMAIL", "admin@kreditinaja.id")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
 
 # ── Paths ─────────────────────────────────────────────────────────────────
 BASE_DIR = os.path.dirname(backend_dir)
@@ -44,6 +47,50 @@ PREDICTION_LOG_PATH = os.path.join(backend_dir, "prediction_logs.json")
 
 # ── Active admin tokens (in-memory store) ─────────────────────────────────
 active_admin_tokens: set = set()
+
+# ── Predictor (di-init saat startup, bukan di module level) ──────────────
+predictor = None
+_cached_eda: DatasetEDAResponse | None = None
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# LIFESPAN — Init model saat startup (Railway-safe)
+# ══════════════════════════════════════════════════════════════════════════
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Startup: load models + init database. Shutdown: cleanup."""
+    global predictor
+    print("=" * 55)
+    print("  PDBL-MLOPS Backend API — Starting up")
+    print("=" * 55)
+
+    # Init database tables (Supabase)
+    try:
+        init_db()
+        print("[OK] Database tables ready (Supabase)")
+    except Exception as e:
+        print(f"[ERROR] Gagal init database: {e}")
+
+    # Load model di sini, bukan di module level
+    try:
+        from predictor import Predictor
+        predictor = Predictor()
+        print("[OK] Predictor berhasil diinisialisasi")
+    except Exception as e:
+        print(f"[ERROR] Gagal init Predictor: {e}")
+        predictor = None
+
+    # Pre-compute EDA (opsional, tidak fatal kalau gagal)
+    try:
+        _compute_eda_from_csv()
+    except Exception as e:
+        print(f"[WARN] Gagal pre-compute EDA: {e}")
+
+    print("[OK] Startup selesai — API siap menerima request")
+    yield
+    print("[INFO] Shutting down...")
+
 
 # ── Init FastAPI ──────────────────────────────────────────────────────────
 app = FastAPI(
@@ -57,9 +104,10 @@ app = FastAPI(
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
-# ── CORS — izinkan request dari frontend (dev & production) ───────────────
+# ── CORS ───────────────────────────────────────────────────────────────────
 _default_origins = [
     "http://localhost:3000",
     "http://localhost:3001",
@@ -78,16 +126,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ── Load model sekali saat startup ───────────────────────────────────────
-predictor = Predictor()
-
 
 # ══════════════════════════════════════════════════════════════════════════
-# DATASET EDA — Load & cache CSV dataset
+# DATASET EDA
 # ══════════════════════════════════════════════════════════════════════════
-
-_cached_eda: DatasetEDAResponse | None = None
-
 
 def _compute_eda_from_csv() -> DatasetEDAResponse:
     """Load prosperLoanData.csv dan hitung semua statistik EDA."""
@@ -108,7 +150,6 @@ def _compute_eda_from_csv() -> DatasetEDAResponse:
     total = len(df)
     eda = DatasetEDAResponse(totalRecords=total)
 
-    # ── Summary stats ──
     if "StatedMonthlyIncome" in df.columns:
         income = pd.to_numeric(df["StatedMonthlyIncome"], errors="coerce").dropna()
         eda.avgMonthlyIncome = round(float(income.mean()), 2)
@@ -123,9 +164,8 @@ def _compute_eda_from_csv() -> DatasetEDAResponse:
         cs = pd.to_numeric(df["CreditScoreRangeLower"], errors="coerce").dropna()
         eda.avgCreditScore = round(float(cs.mean()), 1)
 
-    # Loan amount — Prosper uses "LoanOriginalAmount" or we can derive
     loan_col = None
-    for col_name in ["LoanOriginalAmount", "AmountBorrowed", "LoanOriginalAmount"]:
+    for col_name in ["LoanOriginalAmount", "AmountBorrowed"]:
         if col_name in df.columns:
             loan_col = col_name
             break
@@ -136,46 +176,36 @@ def _compute_eda_from_csv() -> DatasetEDAResponse:
         eda.medianLoanAmount = round(float(la.median()), 2)
         eda.minLoanAmount = round(float(la.min()), 2)
         eda.maxLoanAmount = round(float(la.max()), 2)
-
-        # Loan Amount Histogram
         bins = [0, 2000, 5000, 10000, 15000, 20000, 25000, 35000, 100000]
         labels = ["$0-2k", "$2k-5k", "$5k-10k", "$10k-15k", "$15k-20k", "$20k-25k", "$25k-35k", "$35k+"]
         cuts = pd.cut(la, bins=bins, labels=labels, right=False)
         dist = cuts.value_counts().sort_index()
         eda.loanAmountHistogram = [{"label": str(k), "value": int(v)} for k, v in dist.items()]
 
-    # ── Distribusi ──
     if "LoanStatus" in df.columns:
-        eda.loanStatusDistribution = df["LoanStatus"].value_counts().head(10).to_dict()
-        eda.loanStatusDistribution = {str(k): int(v) for k, v in eda.loanStatusDistribution.items()}
+        eda.loanStatusDistribution = {str(k): int(v) for k, v in df["LoanStatus"].value_counts().head(10).items()}
 
     if "Term" in df.columns:
-        eda.termDistribution = df["Term"].value_counts().to_dict()
-        eda.termDistribution = {str(k): int(v) for k, v in eda.termDistribution.items()}
+        eda.termDistribution = {str(k): int(v) for k, v in df["Term"].value_counts().items()}
 
     if "ProsperRating (Alpha)" in df.columns:
         pr = df["ProsperRating (Alpha)"].dropna().value_counts().sort_index()
         eda.prosperRatingDistribution = {str(k): int(v) for k, v in pr.items()}
 
     if "EmploymentStatus" in df.columns:
-        eda.employmentDistribution = df["EmploymentStatus"].value_counts().head(10).to_dict()
-        eda.employmentDistribution = {str(k): int(v) for k, v in eda.employmentDistribution.items()}
+        eda.employmentDistribution = {str(k): int(v) for k, v in df["EmploymentStatus"].value_counts().head(10).items()}
 
     if "IncomeRange" in df.columns:
-        eda.incomeRangeDistribution = df["IncomeRange"].value_counts().to_dict()
-        eda.incomeRangeDistribution = {str(k): int(v) for k, v in eda.incomeRangeDistribution.items()}
+        eda.incomeRangeDistribution = {str(k): int(v) for k, v in df["IncomeRange"].value_counts().items()}
 
     if "Occupation" in df.columns:
-        eda.occupationTop10 = df["Occupation"].value_counts().head(10).to_dict()
-        eda.occupationTop10 = {str(k): int(v) for k, v in eda.occupationTop10.items()}
+        eda.occupationTop10 = {str(k): int(v) for k, v in df["Occupation"].value_counts().head(10).items()}
 
     if "BorrowerState" in df.columns:
-        eda.borrowerStateTop10 = df["BorrowerState"].value_counts().head(10).to_dict()
-        eda.borrowerStateTop10 = {str(k): int(v) for k, v in eda.borrowerStateTop10.items()}
+        eda.borrowerStateTop10 = {str(k): int(v) for k, v in df["BorrowerState"].value_counts().head(10).items()}
 
     if "IsBorrowerHomeowner" in df.columns:
-        eda.homeownerDistribution = df["IsBorrowerHomeowner"].value_counts().to_dict()
-        eda.homeownerDistribution = {str(k): int(v) for k, v in eda.homeownerDistribution.items()}
+        eda.homeownerDistribution = {str(k): int(v) for k, v in df["IsBorrowerHomeowner"].value_counts().items()}
 
     if "ListingCategory (numeric)" in df.columns:
         cat_map = {
@@ -188,10 +218,8 @@ def _compute_eda_from_csv() -> DatasetEDAResponse:
         }
         lc = pd.to_numeric(df["ListingCategory (numeric)"], errors="coerce").dropna().astype(int)
         lc_named = lc.map(lambda x: cat_map.get(x, f"Cat-{x}"))
-        eda.listingCategoryDistribution = lc_named.value_counts().head(10).to_dict()
-        eda.listingCategoryDistribution = {str(k): int(v) for k, v in eda.listingCategoryDistribution.items()}
+        eda.listingCategoryDistribution = {str(k): int(v) for k, v in lc_named.value_counts().head(10).items()}
 
-    # ── Credit Score Histogram ──
     if "CreditScoreRangeLower" in df.columns:
         cs = pd.to_numeric(df["CreditScoreRangeLower"], errors="coerce").dropna()
         bins_cs = [0, 500, 550, 600, 650, 700, 750, 800, 900]
@@ -201,7 +229,6 @@ def _compute_eda_from_csv() -> DatasetEDAResponse:
         eda.creditScoreHistogram = [{"label": str(k), "value": int(v)} for k, v in dist_cs.items()]
         eda.creditScoreRanges = {str(k): int(v) for k, v in dist_cs.items()}
 
-    # ── DTI Histogram ──
     if "DebtToIncomeRatio" in df.columns:
         dti = pd.to_numeric(df["DebtToIncomeRatio"], errors="coerce").dropna()
         dti_clipped = dti.clip(upper=2.0)
@@ -211,7 +238,6 @@ def _compute_eda_from_csv() -> DatasetEDAResponse:
         dist_dti = cuts_dti.value_counts().sort_index()
         eda.dtiHistogram = [{"label": str(k), "value": int(v)} for k, v in dist_dti.items()]
 
-    # ── Monthly Income Histogram ──
     if "StatedMonthlyIncome" in df.columns:
         inc = pd.to_numeric(df["StatedMonthlyIncome"], errors="coerce").dropna()
         inc_clipped = inc.clip(upper=25000)
@@ -221,7 +247,6 @@ def _compute_eda_from_csv() -> DatasetEDAResponse:
         dist_inc = cuts_inc.value_counts().sort_index()
         eda.monthlyIncomeHistogram = [{"label": str(k), "value": int(v)} for k, v in dist_inc.items()]
 
-    # ── Time series: loans by year ──
     date_col = None
     for col_name in ["ListingCreationDate", "LoanOriginationDate", "DateCreditPulled"]:
         if col_name in df.columns:
@@ -232,7 +257,6 @@ def _compute_eda_from_csv() -> DatasetEDAResponse:
         dates = pd.to_datetime(df[date_col], errors="coerce").dropna()
         by_year = dates.dt.year.value_counts().sort_index()
         eda.loansByYear = [{"label": str(int(k)), "value": int(v)} for k, v in by_year.items()]
-
         by_ym = dates.dt.to_period("M").value_counts().sort_index().tail(36)
         eda.loansByYearMonth = [{"label": str(k), "value": int(v)} for k, v in by_ym.items()]
 
@@ -242,40 +266,46 @@ def _compute_eda_from_csv() -> DatasetEDAResponse:
 
 
 # ══════════════════════════════════════════════════════════════════════════
-# PREDICTION LOGGING
+# PREDICTION LOGGING (DATABASE)
 # ══════════════════════════════════════════════════════════════════════════
 
-def _load_prediction_logs() -> list:
-    """Load prediction logs from JSON file."""
-    if not os.path.exists(PREDICTION_LOG_PATH):
-        return []
+def _save_prediction_to_db(entry: dict):
+    """Simpan prediction log ke database Supabase."""
     try:
-        with open(PREDICTION_LOG_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception:
-        return []
-
-
-def _save_prediction_log(entry: dict):
-    """Append a prediction log entry to the JSON file."""
-    logs = _load_prediction_logs()
-    logs.append(entry)
-    # Keep last 10000 entries max
-    if len(logs) > 10000:
-        logs = logs[-10000:]
-    try:
-        with open(PREDICTION_LOG_PATH, "w", encoding="utf-8") as f:
-            json.dump(logs, f, ensure_ascii=False, indent=2)
+        db = next(get_db())
+        record = LoanApplication(
+            id=entry.get("id", f"pred_{int(time.time() * 1000)}"),
+            user_id=entry.get("userId"),
+            timestamp=datetime.fromisoformat(entry["timestamp"]) if entry.get("timestamp") else datetime.utcnow(),
+            input_data=entry.get("inputData", {}),
+            result=entry.get("result", ""),
+            confidence=entry.get("confidence", 0),
+            plafon=entry.get("plafon"),
+            cicilan_per_bulan=entry.get("cicilanPerBulan"),
+            alasan_penolakan=entry.get("alasanPenolakan"),
+            catatan_risiko=entry.get("catatanRisiko"),
+            loan_amount=entry.get("loanAmount"),
+            loan_term=entry.get("loanTerm"),
+            loan_purpose=entry.get("loanPurpose"),
+            employment=entry.get("employment"),
+            property_area=entry.get("propertyArea"),
+            full_name=entry.get("fullName"),
+            email=entry.get("email"),
+            phone=entry.get("phone"),
+            address=entry.get("address"),
+        )
+        db.add(record)
+        db.commit()
+        db.close()
     except Exception as e:
-        print(f"[WARN] Gagal menyimpan prediction log: {e}")
+        print(f"[WARN] Gagal menyimpan prediction log ke DB: {e}")
 
 
 # ══════════════════════════════════════════════════════════════════════════
-# ADMIN AUTH HELPER
+# ADMIN AUTH
 # ══════════════════════════════════════════════════════════════════════════
 
 def verify_admin_token(authorization: str = Header(default="")):
-    """Validate admin token from Authorization header."""
     token = authorization.replace("Bearer ", "").strip()
     if not token or token not in active_admin_tokens:
         raise HTTPException(status_code=401, detail="Unauthorized: Invalid admin token")
@@ -288,7 +318,6 @@ def verify_admin_token(authorization: str = Header(default="")):
 
 @app.get("/", tags=["Info"])
 def root():
-    """Root endpoint — daftar semua endpoint yang tersedia."""
     return {
         "app"      : "PDBL-MLOPS Loan Prediction API",
         "status"   : "running",
@@ -305,69 +334,51 @@ def root():
 
 @app.get("/health", tags=["Monitoring"])
 def health_check():
-    """Cek apakah backend dan model berjalan normal."""
+    models_ok = predictor is not None and predictor.models_loaded
     return {
         "status"        : "ok",
-        "models_loaded" : predictor.models_loaded,
+        "models_loaded" : models_ok,
         "message"       : (
-            "Semua model ready" if predictor.models_loaded
-            else "Model belum di-load. Cek file .pkl di root project."
+            "Semua model ready" if models_ok
+            else "Model belum di-load. Cek file .pkl di /app/models/"
         ),
     }
 
 
 @app.post("/predict", response_model=PredictOutput, tags=["Prediction"])
 def predict(data: PredictInput):
-    """
-    Prediksi kelayakan pinjaman nasabah (Kredivo-style).
-
-    **Arsitektur:**
-    - 8 field diisi user di frontend (pendapatan, cicilan, pekerjaan, dll)
-    - Sisanya diisi median dataset Prosper (median imputation)
-    - Model ML memprediksi berdasarkan gabungan keduanya
-    - Tanpa heuristic rules / hierarchical rules
-
-    **Alur:**
-    1. Ekstrak 8 field dari input user
-    2. Klasifikasi (26 fitur) → LAYAK / TIDAK LAYAK
-    3. Jika LAYAK → Regresi (41 fitur) → Plafon maksimal
-    4. Hitung cicilan anuitas dari nominal yang diajukan
-
-    **Returns:**
-    - `result`: "LAYAK" atau "TIDAK LAYAK"
-    - `confidence`: tingkat keyakinan model (%)
-    - `plafon`: plafon maksimal yang bisa dicairkan (jika LAYAK)
-    - `cicilan_per_bulan`: cicilan bulanan (jika LAYAK)
-    - `alasan_penolakan`: alasan jika TIDAK LAYAK
-    """
+    if predictor is None or not predictor.models_loaded:
+        raise HTTPException(
+            status_code=503,
+            detail="Model belum siap. Cek /health untuk detail."
+        )
     try:
         result = predictor.predict(data)
 
-        # ── Log prediction ──
         log_entry = {
-            "id": f"pred_{int(time.time() * 1000)}",
-            "timestamp": datetime.now().isoformat(),
-            "inputData": data.model_dump(),
-            "result": result.result,
-            "confidence": result.confidence,
-            "plafon": result.plafon,
+            "id"             : f"pred_{int(time.time() * 1000)}",
+            "timestamp"      : datetime.now().isoformat(),
+            "userId"         : data.userId,
+            "inputData"      : data.model_dump(),
+            "result"         : result.result,
+            "confidence"     : result.confidence,
+            "plafon"         : result.plafon,
             "cicilanPerBulan": result.cicilan_per_bulan,
             "alasanPenolakan": result.alasan_penolakan,
-            "catatanRisiko": result.catatan_risiko,
-            "loanAmount": data.loanAmount,
-            "loanTerm": data.loanTerm,
-            "loanPurpose": data.loanPurpose,
-            "employment": data.employment,
-            "propertyArea": data.propertyArea,
-            # Data kontak nasabah
-            "fullName": data.fullName,
-            "email": data.email,
-            "phone": data.phone,
-            "address": data.address,
+            "catatanRisiko"  : result.catatan_risiko,
+            "loanAmount"     : data.loanAmount,
+            "loanTerm"       : data.loanTerm,
+            "loanPurpose"    : data.loanPurpose,
+            "employment"     : data.employment,
+            "propertyArea"   : data.propertyArea,
+            "fullName"       : data.fullName,
+            "email"          : data.email,
+            "phone"          : data.phone,
+            "address"        : data.address,
         }
-        _save_prediction_log(log_entry)
-
+        _save_prediction_to_db(log_entry)
         return result
+
     except RuntimeError as e:
         raise HTTPException(status_code=503, detail=str(e))
     except Exception as e:
@@ -380,7 +391,6 @@ def predict(data: PredictInput):
 
 @app.post("/admin/login", response_model=AdminLoginResponse, tags=["Admin"])
 def admin_login(data: AdminLoginRequest):
-    """Login admin — validasi credential."""
     if data.email == ADMIN_EMAIL and data.password == ADMIN_PASSWORD:
         import hashlib
         token = hashlib.sha256(f"admin_{time.time()}".encode()).hexdigest()[:32]
@@ -391,10 +401,6 @@ def admin_login(data: AdminLoginRequest):
 
 @app.get("/admin/eda", response_model=DatasetEDAResponse, tags=["Admin"])
 def admin_eda(token: str = Depends(verify_admin_token)):
-    """
-    Mengembalikan statistik EDA komprehensif dari dataset prosperLoanData.csv.
-    Data di-cache setelah pertama kali dihitung.
-    """
     try:
         return _compute_eda_from_csv()
     except Exception as e:
@@ -402,44 +408,36 @@ def admin_eda(token: str = Depends(verify_admin_token)):
 
 
 @app.get("/admin/predictions", response_model=PredictionLogsResponse, tags=["Admin"])
-def admin_predictions(token: str = Depends(verify_admin_token)):
-    """
-    Mengembalikan semua log prediksi user.
-    Data dari prediction_logs.json yang di-append setiap kali /predict dipanggil.
-    """
-    logs = _load_prediction_logs()
+def admin_predictions(token: str = Depends(verify_admin_token), db: Session = Depends(get_db)):
+    logs = db.query(LoanApplication).order_by(LoanApplication.timestamp.desc()).limit(500).all()
     entries = []
-    for log in reversed(logs):  # newest first
+    for log in logs:
         entries.append(PredictionLogEntry(
-            id=log.get("id", ""),
-            timestamp=log.get("timestamp", ""),
-            inputData=log.get("inputData", {}),
-            result=log.get("result", ""),
-            confidence=log.get("confidence", 0),
-            plafon=log.get("plafon"),
-            cicilanPerBulan=log.get("cicilanPerBulan"),
-            alasanPenolakan=log.get("alasanPenolakan"),
-            catatanRisiko=log.get("catatanRisiko"),
-            loanAmount=log.get("loanAmount", "0"),
-            loanTerm=log.get("loanTerm", "36"),
-            loanPurpose=log.get("loanPurpose", ""),
-            creditHistory=log.get("creditHistory", ""),
-            employment=log.get("employment", ""),
-            propertyArea=log.get("propertyArea", ""),
-            fullName=log.get("fullName", ""),
-            email=log.get("email", ""),
-            phone=log.get("phone", ""),
-            address=log.get("address", ""),
+            id=log.id or "",
+            timestamp=log.timestamp.isoformat() if log.timestamp else "",
+            inputData=log.input_data or {},
+            result=log.result or "",
+            confidence=log.confidence or 0,
+            plafon=int(log.plafon) if log.plafon else None,
+            cicilanPerBulan=log.cicilan_per_bulan,
+            alasanPenolakan=log.alasan_penolakan,
+            catatanRisiko=log.catatan_risiko,
+            loanAmount=log.loan_amount or "0",
+            loanTerm=log.loan_term or "36",
+            loanPurpose=log.loan_purpose or "",
+            creditHistory="",
+            employment=log.employment or "",
+            propertyArea=log.property_area or "",
+            fullName=log.full_name or "",
+            email=log.email or "",
+            phone=log.phone or "",
+            address=log.address or "",
         ))
     return PredictionLogsResponse(total=len(entries), predictions=entries)
 
 
 @app.post("/admin/stats", response_model=EDAStats, tags=["Admin"])
 def admin_stats(data: BulkDataRequest):
-    """
-    Hitung statistik EDA dari data yang dikirim frontend.
-    Frontend mengirim semua users + predictions dari localStorage.
-    """
     users = data.users
     predictions = data.predictions
 
@@ -450,11 +448,10 @@ def admin_stats(data: BulkDataRequest):
     approval_rate = round((layak / total_preds * 100), 1) if total_preds > 0 else 0.0
     avg_conf = round(sum(p.get("confidence", 0) for p in predictions) / total_preds, 1) if total_preds > 0 else 0.0
 
-    # Distribusi tujuan pinjaman
-    purpose_dist = {}
-    credit_dist = {}
-    area_dist = {}
-    emp_dist = {}
+    purpose_dist: dict = {}
+    credit_dist: dict  = {}
+    area_dist: dict    = {}
+    emp_dist: dict     = {}
     for p in predictions:
         inp = p.get("inputData", {})
         purpose = inp.get("loanPurpose", "Lainnya")
@@ -466,15 +463,17 @@ def admin_stats(data: BulkDataRequest):
         emp = inp.get("employment", "Unknown")
         emp_dist[emp] = emp_dist.get(emp, 0) + 1
 
-    # Loan amount ranges
     ranges = {"$0-1k": 0, "$1k-5k": 0, "$5k-10k": 0, "$10k-25k": 0, "$25k+": 0}
     for p in predictions:
-        amt = int(p.get("loanAmount", "0") or "0")
-        if amt < 1000: ranges["$0-1k"] += 1
-        elif amt < 5000: ranges["$1k-5k"] += 1
+        try:
+            amt = int(p.get("loanAmount", "0") or "0")
+        except (ValueError, TypeError):
+            amt = 0
+        if amt < 1000:   ranges["$0-1k"] += 1
+        elif amt < 5000:  ranges["$1k-5k"] += 1
         elif amt < 10000: ranges["$5k-10k"] += 1
         elif amt < 25000: ranges["$10k-25k"] += 1
-        else: ranges["$25k+"] += 1
+        else:             ranges["$25k+"] += 1
 
     return EDAStats(
         totalUsers=total_users,
@@ -492,28 +491,186 @@ def admin_stats(data: BulkDataRequest):
 
 
 # ══════════════════════════════════════════════════════════════════════════
-# ENTRY POINT
+# USER AUTH ENDPOINTS (Supabase-backed)
+# ══════════════════════════════════════════════════════════════════════════
+
+from pydantic import BaseModel
+from typing import Optional
+
+class RegisterRequest(BaseModel):
+    email: str
+    password: str
+    fullName: str
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+class ProfileUpdateRequest(BaseModel):
+    phone: Optional[str] = None
+    age: Optional[str] = None
+    gender: Optional[str] = None
+    maritalStatus: Optional[str] = None
+    dependents: Optional[str] = None
+    education: Optional[str] = None
+    employment: Optional[str] = None
+    monthlyIncome: Optional[str] = None
+    additionalIncome: Optional[str] = None
+    address: Optional[str] = None
+    profileCompleted: Optional[bool] = None
+    existingInstallments: Optional[str] = None
+    fullName: Optional[str] = None
+
+
+@app.post("/auth/register", tags=["Auth"])
+def auth_register(data: RegisterRequest, db: Session = Depends(get_db)):
+    existing = db.query(UserDB).filter(UserDB.email == data.email.lower()).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Email sudah terdaftar")
+
+    import hashlib
+    user_id = f"user_{int(time.time() * 1000)}_{hashlib.md5(data.email.encode()).hexdigest()[:8]}"
+    new_user = UserDB(
+        id=user_id,
+        email=data.email.lower(),
+        password=data.password,
+        full_name=data.fullName,
+    )
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    token = hashlib.sha256(f"user_{time.time()}_{user_id}".encode()).hexdigest()[:32]
+    return {
+        "success": True,
+        "token": token,
+        "user": {
+            "id": new_user.id,
+            "email": new_user.email,
+            "fullName": new_user.full_name,
+            "createdAt": new_user.created_at.isoformat() if new_user.created_at else "",
+            "profile": _user_to_profile(new_user),
+        }
+    }
+
+
+@app.post("/auth/login", tags=["Auth"])
+def auth_login(data: LoginRequest, db: Session = Depends(get_db)):
+    user = db.query(UserDB).filter(
+        UserDB.email == data.email.lower(),
+        UserDB.password == data.password
+    ).first()
+    if not user:
+        raise HTTPException(status_code=401, detail="Email atau password salah")
+
+    import hashlib
+    token = hashlib.sha256(f"user_{time.time()}_{user.id}".encode()).hexdigest()[:32]
+    return {
+        "success": True,
+        "token": token,
+        "user": {
+            "id": user.id,
+            "email": user.email,
+            "fullName": user.full_name,
+            "createdAt": user.created_at.isoformat() if user.created_at else "",
+            "profile": _user_to_profile(user),
+        }
+    }
+
+
+@app.get("/auth/profile/{user_id}", tags=["Auth"])
+def auth_get_profile(user_id: str, db: Session = Depends(get_db)):
+    user = db.query(UserDB).filter(UserDB.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User tidak ditemukan")
+    return {
+        "id": user.id,
+        "email": user.email,
+        "fullName": user.full_name,
+        "createdAt": user.created_at.isoformat() if user.created_at else "",
+        "profile": _user_to_profile(user),
+    }
+
+
+@app.put("/auth/profile/{user_id}", tags=["Auth"])
+def auth_update_profile(user_id: str, data: ProfileUpdateRequest, db: Session = Depends(get_db)):
+    user = db.query(UserDB).filter(UserDB.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User tidak ditemukan")
+
+    if data.phone is not None: user.phone = data.phone
+    if data.age is not None: user.age = data.age
+    if data.gender is not None: user.gender = data.gender
+    if data.maritalStatus is not None: user.marital_status = data.maritalStatus
+    if data.dependents is not None: user.dependents = data.dependents
+    if data.education is not None: user.education = data.education
+    if data.employment is not None: user.employment = data.employment
+    if data.monthlyIncome is not None: user.monthly_income = data.monthlyIncome
+    if data.additionalIncome is not None: user.additional_income = data.additionalIncome
+    if data.address is not None: user.address = data.address
+    if data.profileCompleted is not None: user.profile_completed = data.profileCompleted
+    if data.existingInstallments is not None: user.existing_installments = data.existingInstallments
+    if data.fullName is not None:
+        user.full_name = data.fullName
+
+    db.commit()
+    db.refresh(user)
+    return {"success": True, "profile": _user_to_profile(user)}
+
+
+@app.get("/auth/predictions/{user_id}", tags=["Auth"])
+def auth_get_predictions(user_id: str, db: Session = Depends(get_db)):
+    logs = db.query(LoanApplication).filter(
+        LoanApplication.user_id == user_id
+    ).order_by(LoanApplication.timestamp.desc()).limit(100).all()
+
+    predictions = []
+    for log in logs:
+        predictions.append({
+            "id": log.id,
+            "date": log.timestamp.isoformat() if log.timestamp else "",
+            "loanAmount": log.loan_amount or "0",
+            "loanTerm": log.loan_term or "36",
+            "result": log.result or "",
+            "confidence": log.confidence or 0,
+            "inputData": log.input_data or {},
+            "plafon": int(log.plafon) if log.plafon else None,
+            "cicilanPerBulan": log.cicilan_per_bulan,
+            "alasanPenolakan": log.alasan_penolakan,
+            "catatanRisiko": log.catatan_risiko,
+        })
+    return {"predictions": predictions}
+
+
+def _user_to_profile(user: UserDB) -> dict:
+    return {
+        "fullName": user.full_name or "",
+        "email": user.email or "",
+        "phone": user.phone or "",
+        "age": user.age or "",
+        "gender": user.gender or "",
+        "maritalStatus": user.marital_status or "",
+        "dependents": user.dependents or "0",
+        "education": user.education or "",
+        "employment": user.employment or "",
+        "monthlyIncome": user.monthly_income or "0",
+        "additionalIncome": user.additional_income or "0",
+        "address": user.address or "",
+        "profileCompleted": user.profile_completed or False,
+        "existingInstallments": user.existing_installments or "0",
+    }
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# ENTRY POINT (lokal saja — Railway pakai CMD di Dockerfile)
 # ══════════════════════════════════════════════════════════════════════════
 
 if __name__ == "__main__":
-    # Preload EDA data saat startup
-    print("=" * 55)
-    print("  PDBL-MLOPS Backend API")
-    print("=" * 55)
-    print("  URL   : http://localhost:8000")
-    print("  Docs  : http://localhost:8000/docs")
-    print("=" * 55)
-
-    # Pre-compute EDA
-    try:
-        _compute_eda_from_csv()
-    except Exception as e:
-        print(f"[WARN] Gagal pre-compute EDA: {e}")
-
     port = int(os.environ.get("PORT", 8000))
     uvicorn.run(
         "main:app",
         host="0.0.0.0",
         port=port,
-        reload=os.environ.get("RAILWAY_ENVIRONMENT") is None,
+        reload=False,  # Jangan pakai reload di production
     )
+

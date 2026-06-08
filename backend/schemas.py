@@ -38,6 +38,9 @@ class PredictInput(BaseModel):
     email: Optional[str] = ""
     phone: Optional[str] = ""
     address: Optional[str] = ""
+    
+    # ── User ID (untuk linking ke database) ──
+    userId: Optional[str] = None
 
 
 class PredictOutput(BaseModel):

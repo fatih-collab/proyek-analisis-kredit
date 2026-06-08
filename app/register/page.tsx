@@ -15,13 +15,13 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setError('');
     if (!form.fullName || !form.email || !form.password) { setError('Semua field wajib diisi'); return; }
     if (form.password.length < 6) { setError('Password minimal 6 karakter'); return; }
     if (form.password !== form.confirmPassword) { setError('Password tidak cocok'); return; }
     setLoading(true);
-    const res = register(form.email, form.password, form.fullName);
+    const res = await register(form.email, form.password, form.fullName);
     setLoading(false);
     if (res.success) router.push('/profile'); else setError(res.error || 'Gagal mendaftar');
   };
