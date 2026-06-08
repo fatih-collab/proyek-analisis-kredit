@@ -1,10 +1,10 @@
-# 🛡️ CreditCare - MLOps Loan Predictor & Credit Risk System
+CreditCare - MLOps Loan Predictor & Credit Risk System
 
 Aplikasi web full-stack untuk prediksi kelayakan kredit (*Credit Scoring*) dan penentuan batas aman pinjaman (*Plafon Limit*) berbasis Machine Learning. Proyek ini dibangun menggunakan arsitektur MLOps modern yang dapat dideploy secara kontainerisasi.
 
 ---
 
-## 🚀 Fitur Utama
+Fitur Utama
 - **Klasifikasi Risiko Kredit**: Memprediksi kelayakan nasabah (*LAYAK / TIDAK LAYAK*) menggunakan LightGBM Classifier dengan threshold optimal **0.5200**.
 - **Regresi Plafon Kredit**: Menentukan batas maksimal limit pinjaman (*Plafon*) menggunakan LightGBM Regressor.
 - **Explainable AI (XAI)**: Sistem otomatis penolakan jika nominal pengajuan melampaui plafon limit aman.
@@ -13,7 +13,7 @@ Aplikasi web full-stack untuk prediksi kelayakan kredit (*Credit Scoring*) dan p
 
 ---
 
-## 🛠️ Tech Stack
+Tech Stack
 - **Frontend**: Next.js (React + TypeScript + TailwindCSS)
 - **Backend**: FastAPI (Python 3.12 + Scikit-Learn + LightGBM)
 - **Database**: Supabase / PostgreSQL (Cloud Database)
@@ -22,9 +22,7 @@ Aplikasi web full-stack untuk prediksi kelayakan kredit (*Credit Scoring*) dan p
 
 ---
 
-## 💻 Panduan Instalasi & Menjalankan Aplikasi
-
-Pastikan Anda telah menginstal **Python 3.10+**, **Node.js 18+**, dan **Docker** (jika menggunakan kontainer).
+Panduan Instalasi 
 
 ### 1. Klon Repositori & Pindah ke Branch `beta`
 ```bash
@@ -97,7 +95,7 @@ Untuk demo praktis, Anda bisa menjalankan seluruh layanan (Frontend & Backend) s
 
 ---
 
-## 📂 Struktur Folder Utama
+Struktur Folder Utama
 ```
 PDBL-MLOPS/
 ├── app/                  # Frontend Next.js (React/TypeScript)
