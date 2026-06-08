@@ -38,7 +38,6 @@ if sys.stdout.encoding != 'utf-8':
 # ══════════════════════════════════════════════════════════════════════════
 
 BASE_DIR   = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 def _find_model(filename: str) -> str:
     """Cari file model di beberapa lokasi (Docker /app/models/, parent dir, current dir)."""
     candidates = [
@@ -59,9 +58,9 @@ MODEL_THR  = _find_model("threshold_tuned.pkl")
 MODEL_REG  = _find_model("model_regresi_tuned_loan.pkl")
 
 # Dataset CSV — opsional, untuk median computation
-DATASET_CSV = os.path.join(BASE_DIR, "Dataset", "CLEANN_prosperloandata (1).csv")
+DATASET_CSV = os.path.join(BASE_DIR, "Dataset", "prosperloandata_28_fitur_large.csv")
 if not os.path.exists(DATASET_CSV):
-    DATASET_CSV = os.path.join(BASE_DIR, "Dataset", "prosperLoanData.csv")
+    DATASET_CSV = os.path.join(BASE_DIR, "prosperloandata_28_fitur_small.csv")
 
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -225,6 +224,8 @@ class Predictor:
         try:
             print(f"[INFO] Menghitung median dari {DATASET_CSV} ...")
             df = pd.read_csv(DATASET_CSV, low_memory=False)
+            if "IncomeRange" in df.columns:
+                df["IncomeRange"] = df["IncomeRange"].replace("Not displayed", "$25,000-49,999")
 
             # Kolom numerik yang perlu dihitung mediannya
             numeric_cols = [

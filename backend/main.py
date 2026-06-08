@@ -37,9 +37,9 @@ ADMIN_PASSWORD = "admin123"
 
 # ── Paths ─────────────────────────────────────────────────────────────────
 BASE_DIR = os.path.dirname(backend_dir)
-DATASET_PATH = os.path.join(BASE_DIR, "Dataset", "CLEANN_prosperloandata (1).csv")
+DATASET_PATH = os.path.join(BASE_DIR, "Dataset", "prosperloandata_28_fitur_large.csv")
 if not os.path.exists(DATASET_PATH):
-    DATASET_PATH = os.path.join(BASE_DIR, "Dataset", "prosperLoanData.csv")
+    DATASET_PATH = os.path.join(BASE_DIR, "prosperloandata_28_fitur_small.csv")
 PREDICTION_LOG_PATH = os.path.join(backend_dir, "prediction_logs.json")
 
 # ── Active admin tokens (in-memory store) ─────────────────────────────────
@@ -101,6 +101,8 @@ def _compute_eda_from_csv() -> DatasetEDAResponse:
 
     print(f"[INFO] Loading dataset dari {DATASET_PATH} ...")
     df = pd.read_csv(DATASET_PATH, low_memory=False)
+    if "IncomeRange" in df.columns:
+        df["IncomeRange"] = df["IncomeRange"].replace("Not displayed", "$25,000-49,999")
     print(f"[OK] Dataset loaded: {len(df)} rows, {len(df.columns)} columns")
 
     total = len(df)
