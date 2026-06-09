@@ -1,6 +1,7 @@
 # ═══════════════════════════════════════════════════════════════════════
 # Dockerfile — FastAPI Backend (Railway-compatible)
 # Build dari ROOT context: docker build -t pdbl-backend -f backend/Dockerfile .
+# Trigger deploy: rollback sync
 # ═══════════════════════════════════════════════════════════════════════
 
 FROM python:3.11-slim
