@@ -1,5 +1,6 @@
 import os
 import time
+import uuid
 import joblib
 import numpy as np
 import pandas as pd
@@ -251,23 +252,28 @@ def retrain_models(db: Session, predictor_instance=None):
     try:
         # Log metrik klasifikasi
         metric_clf = ModelMetric(
+            id=str(uuid.uuid4()),           # [FIX] id wajib diisi karena String PK (bukan auto-increment)
             training_date=datetime.utcnow(),
             model_type="Klasifikasi",
             accuracy=acc_clf,
             f1_score=f1_clf,
-            dataset_size=len(df_all)
+            threshold=best_thresh,          # [FIX] simpan threshold optimal
+            dataset_size=len(df_all),
+            db_data_size=len(db_rows),      # [FIX] jumlah data dari DB
         )
         db.add(metric_clf)
 
         # Log metrik regresi
         metric_reg = ModelMetric(
+            id=str(uuid.uuid4()),           # [FIX] id wajib diisi
             training_date=datetime.utcnow(),
             model_type="Regresi",
             rmse=rmse_reg,
-            dataset_size=len(df_reg_all)
+            dataset_size=len(df_reg_all),
+            db_data_size=len(db_rows),
         )
         db.add(metric_reg)
-        
+
         db.commit()
         print("[MLOps] Metrik evaluasi model berhasil dicatat di database.")
     except Exception as e:

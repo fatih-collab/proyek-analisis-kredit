@@ -112,7 +112,6 @@ class PredictionLogEntry(BaseModel):
     """Single prediction log entry"""
     id: str = ""
     timestamp: str = ""
-    inputData: dict = {}
     result: str = ""
     confidence: float = 0.0
     plafon: Optional[int] = None
@@ -122,7 +121,6 @@ class PredictionLogEntry(BaseModel):
     loanAmount: str = "0"
     loanTerm: str = "36"
     loanPurpose: str = ""
-    creditHistory: str = ""
     employment: str = ""
     propertyArea: str = ""
     fullName: Optional[str] = ""

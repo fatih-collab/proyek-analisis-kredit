@@ -1,4 +1,5 @@
 import os
+import uuid
 from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Boolean, JSON, Text
 from sqlalchemy.orm import declarative_base, sessionmaker
 from datetime import datetime
@@ -45,17 +46,19 @@ class UserDB(Base):
 
     # Profile fields
     phone = Column(String, default="")
-    age = Column(String, default="")
     gender = Column(String, default="")
     marital_status = Column(String, default="")
-    dependents = Column(String, default="0")
+    dependents = Column(String, default="0")   # [FIX] ubah Integer → String agar konsisten dengan form frontend
     education = Column(String, default="")
+    profile_completed = Column(Boolean, default=False)
+
+    # [FIX] Kolom yang sebelumnya hilang — dipakai oleh main.py & Dummy.py
+    age = Column(String, default="")
     employment = Column(String, default="")
     monthly_income = Column(String, default="0")
     additional_income = Column(String, default="0")
-    address = Column(Text, default="")
-    profile_completed = Column(Boolean, default=False)
     existing_installments = Column(String, default="0")
+    address = Column(String, default="")
 
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -66,46 +69,92 @@ class LoanApplication(Base):
     __tablename__ = "loan_applications"
 
     id = Column(String, primary_key=True, index=True)
-    user_id = Column(String, index=True, nullable=True)  # Link ke user yang mengajukan
-    timestamp = Column(DateTime, default=datetime.utcnow)
-    input_data = Column(JSON)   # Menyimpan data input JSON dari frontend
-    result = Column(String)     # LAYAK / TIDAK LAYAK
-    confidence = Column(Float)
-    plafon = Column(Float, nullable=True)
-    cicilan_per_bulan = Column(Float, nullable=True)
-    alasan_penolakan = Column(JSON, nullable=True)  # List of strings
-    catatan_risiko = Column(String, nullable=True)
+    user_id = Column(String, index=True, nullable=True)  # FK ke users
 
-    # Info tambahan dari form
-    loan_amount = Column(String, nullable=True)
+    # [FIX] Tambahkan 'timestamp' sebagai alias created_at — dipakai main.py & Dummy.py
+    timestamp = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    # Data pinjaman
+    loan_amount = Column(String, nullable=True)   # [FIX] String agar konsisten dengan form (bukan Float)
     loan_term = Column(String, nullable=True)
     loan_purpose = Column(String, nullable=True)
+
+    # [FIX] Kolom tambahan yang dipakai Dummy.py & mlops_pipeline.py
     employment = Column(String, nullable=True)
     property_area = Column(String, nullable=True)
-    full_name = Column(String, nullable=True)
-    email = Column(String, nullable=True)
-    phone = Column(String, nullable=True)
-    address = Column(Text, nullable=True)
+
+    # [FIX] input_data JSON — dipakai main.py (auth/predictions) & mlops_pipeline.py
+    input_data = Column(JSON, nullable=True)
+
+    # Hasil prediksi
+    plafon = Column(Float, nullable=True)
+    cicilan_per_bulan = Column(Float, nullable=True)
+    result = Column(String)         # LAYAK / TIDAK LAYAK
+    confidence = Column(Float)
+    alasan_penolakan = Column(JSON, nullable=True)   # List of strings
+    catatan_risiko = Column(String, nullable=True)
 
     # Kolom MLOps (Ground Truth)
-    actual_status = Column(String, nullable=True)   # Contoh: "Completed", "Chargedoff"
+    actual_status = Column(String, nullable=True)    # "Completed", "Chargedoff", dst.
     is_verified_for_training = Column(Boolean, default=False)
 
 
 # ══════════════════════════════════════════════════════════════════════════
-# TABEL: Model Metrics — Metrik Evaluasi Model
+# TABEL: User Financial Profiles — Data Keuangan & Pekerjaan User
+# ══════════════════════════════════════════════════════════════════════════
+
+class UserFinancialProfile(Base):
+    __tablename__ = "user_financial_profiles"
+
+    id = Column(String, primary_key=True, index=True)
+    user_id = Column(String, index=True, nullable=False)  # FK ke users
+
+    employment = Column(String, default="")
+    monthly_income = Column(String, default="0")
+    additional_income = Column(String, default="0")
+    existing_installments = Column(String, default="0")
+    address = Column(String, default="")
+    property_area = Column(String, default="")
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# TABEL: Training Data Log — Log Data Training Model
+# ══════════════════════════════════════════════════════════════════════════
+
+class TrainingDataLog(Base):
+    __tablename__ = "training_data_log"
+
+    id = Column(String, primary_key=True, index=True)
+    loan_application_id = Column(String, index=True, nullable=False)  # FK ke loan_applications
+    used_at = Column(DateTime, default=datetime.utcnow)
+    model_version = Column(String, nullable=True)
+    included_in_training = Column(Boolean, default=False)
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# TABEL: Model Metrics — Log Evaluasi Setiap Retraining  [FIX] BARU
 # ══════════════════════════════════════════════════════════════════════════
 
 class ModelMetric(Base):
     __tablename__ = "model_metrics"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
     training_date = Column(DateTime, default=datetime.utcnow)
-    model_type = Column(String)     # "Klasifikasi" atau "Regresi"
+    model_type = Column(String, nullable=False)   # "Klasifikasi" / "Regresi"
+
+    # Metrik Klasifikasi
     accuracy = Column(Float, nullable=True)
     f1_score = Column(Float, nullable=True)
+    threshold = Column(Float, nullable=True)      # optimal decision threshold
+
+    # Metrik Regresi
     rmse = Column(Float, nullable=True)
-    dataset_size = Column(Integer)
+
+    # Info dataset saat training
+    dataset_size = Column(Integer, nullable=True)
+    db_data_size = Column(Integer, nullable=True)  # jumlah data dari DB (bukan base CSV)
 
 
 # ══════════════════════════════════════════════════════════════════════════

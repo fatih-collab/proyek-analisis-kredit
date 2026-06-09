@@ -11,7 +11,7 @@ class PredictInput(BaseModel):
     Semua field bertipe string sesuai dengan state form di React.
     """
     # ── Data Profil User (auto-fill dari AuthContext) ──
-    age: str = ""
+    age: str = "25"                  # [FIX] ditambahkan — dipakai predictor.py & validate_models.py
     gender: str = ""
     maritalStatus: str = ""
     dependents: str = "0"

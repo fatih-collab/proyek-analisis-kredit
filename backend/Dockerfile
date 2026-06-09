@@ -1,7 +1,6 @@
 # ═══════════════════════════════════════════════════════════════════════
 # Dockerfile — FastAPI Backend (Railway-compatible)
 # Build dari ROOT context: docker build -t pdbl-backend -f backend/Dockerfile .
-# Trigger deploy: rollback sync
 # ═══════════════════════════════════════════════════════════════════════
 
 FROM python:3.11-slim
@@ -18,11 +17,11 @@ ENV PYTHONIOENCODING=utf-8
 ENV PYTHONUNBUFFERED=1
 
 # Copy requirements first (cache layer)
-COPY backend/requirements.txt .
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy backend code
-COPY backend/ .
+COPY . .
 
 # Copy model files dari root ke /app/models/
 RUN mkdir -p /app/models

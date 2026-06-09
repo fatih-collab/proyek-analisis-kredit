@@ -137,19 +137,6 @@ def _compute_eda_from_csv() -> DatasetEDAResponse:
     if _cached_eda is not None:
         return _cached_eda
 
-    # Coba load dari cache json terlebih dahulu (sangat berguna di Railway)
-    cache_path = os.path.join(backend_dir, "eda_cache.json")
-    if os.path.exists(cache_path):
-        try:
-            print(f"[INFO] Membaca EDA stats dari cache: {cache_path} ...")
-            with open(cache_path, "r") as f:
-                data = json.load(f)
-            _cached_eda = DatasetEDAResponse(**data)
-            print(f"[OK] EDA stats loaded from cache: {_cached_eda.totalRecords} records")
-            return _cached_eda
-        except Exception as e:
-            print(f"[WARN] Gagal membaca EDA cache: {e}")
-
     if not os.path.exists(DATASET_PATH):
         print(f"[WARN] Dataset tidak ditemukan: {DATASET_PATH}")
         return DatasetEDAResponse()
@@ -290,6 +277,7 @@ def _save_prediction_to_db(entry: dict):
             id=entry.get("id", f"pred_{int(time.time() * 1000)}"),
             user_id=entry.get("userId"),
             timestamp=datetime.fromisoformat(entry["timestamp"]) if entry.get("timestamp") else datetime.utcnow(),
+            created_at=datetime.fromisoformat(entry["timestamp"]) if entry.get("timestamp") else datetime.utcnow(),
             input_data=entry.get("inputData", {}),
             result=entry.get("result", ""),
             confidence=entry.get("confidence", 0),
@@ -302,10 +290,8 @@ def _save_prediction_to_db(entry: dict):
             loan_purpose=entry.get("loanPurpose"),
             employment=entry.get("employment"),
             property_area=entry.get("propertyArea"),
-            full_name=entry.get("fullName"),
-            email=entry.get("email"),
-            phone=entry.get("phone"),
-            address=entry.get("address"),
+            # [FIX] full_name, email, phone, address TIDAK ada di tabel loan_applications.
+            # Data kontak user diambil dari tabel users via user_id saat dibutuhkan.
         )
         db.add(record)
         db.commit()
@@ -428,12 +414,21 @@ def admin_eda(token: str = Depends(verify_admin_token)):
 @app.get("/admin/predictions", response_model=PredictionLogsResponse, tags=["Admin"])
 def admin_predictions(token: str = Depends(verify_admin_token), db: Session = Depends(get_db)):
     logs = db.query(LoanApplication).order_by(LoanApplication.timestamp.desc()).limit(500).all()
+
+    # [FIX] Kumpulkan semua user_id unik lalu ambil data user sekaligus (1 query)
+    user_ids = list({log.user_id for log in logs if log.user_id})
+    users_map: dict = {}
+    if user_ids:
+        users = db.query(UserDB).filter(UserDB.id.in_(user_ids)).all()
+        users_map = {u.id: u for u in users}
+
     entries = []
     for log in logs:
+        # [FIX] Ambil data kontak dari tabel users, bukan dari loan_applications
+        user = users_map.get(log.user_id) if log.user_id else None
         entries.append(PredictionLogEntry(
             id=log.id or "",
             timestamp=log.timestamp.isoformat() if log.timestamp else "",
-            inputData=log.input_data or {},
             result=log.result or "",
             confidence=log.confidence or 0,
             plafon=int(log.plafon) if log.plafon else None,
@@ -443,13 +438,12 @@ def admin_predictions(token: str = Depends(verify_admin_token), db: Session = De
             loanAmount=log.loan_amount or "0",
             loanTerm=log.loan_term or "36",
             loanPurpose=log.loan_purpose or "",
-            creditHistory="",
             employment=log.employment or "",
             propertyArea=log.property_area or "",
-            fullName=log.full_name or "",
-            email=log.email or "",
-            phone=log.phone or "",
-            address=log.address or "",
+            fullName=user.full_name if user else "",
+            email=user.email if user else "",
+            phone=user.phone if user else "",
+            address=user.address if user else "",
         ))
     return PredictionLogsResponse(total=len(entries), predictions=entries)
 
