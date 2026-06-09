@@ -169,7 +169,7 @@ export default function Home() {
 
 
               {/* Responsive Header Title */}
-              <h1 className="leading-[1.08] mb-6 font-black tracking-tight" style={{ fontSize: 'clamp(2.8rem, 6vw, 5rem)', letterSpacing: '-0.04em' }}>
+              <h1 className="leading-tight mb-6 font-black tracking-tight" style={{ fontSize: 'clamp(2.0rem, 4.2vw, 3.2rem)', letterSpacing: '-0.03em' }}>
                 <span className={`block text-sky-950 dark:text-white transition-all duration-700 ${heroRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: '150ms' }}>
                   Verifikasi Cerdas Sebelum Meminjam,
                 </span>

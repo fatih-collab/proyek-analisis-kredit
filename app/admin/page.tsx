@@ -566,7 +566,6 @@ export default function AdminDashboard() {
                     <HistogramChart title="Nominal Pengajuan Pinjaman (Loan Amount)" data={eda.loanAmountHistogram} color="#10b981" />
                     <BarChart title="Pilihan Tenor Pinjaman (Bulan)" data={dictToChartData(eda.termDistribution)} />
                     <BarChart title="Top 10 Kategori Penggunaan Pinjaman" data={dictToChartData(eda.listingCategoryDistribution)} />
-                    <LineChart title="Perkembangan Jumlah Pinjaman per Tahun" data={eda.loansByYear} color="#0ea5e9" />
                   </div>
                 )}
               </section>
