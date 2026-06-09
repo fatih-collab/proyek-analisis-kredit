@@ -137,6 +137,19 @@ def _compute_eda_from_csv() -> DatasetEDAResponse:
     if _cached_eda is not None:
         return _cached_eda
 
+    # Coba load dari cache json terlebih dahulu (sangat berguna di Railway)
+    cache_path = os.path.join(backend_dir, "eda_cache.json")
+    if os.path.exists(cache_path):
+        try:
+            print(f"[INFO] Membaca EDA stats dari cache: {cache_path} ...")
+            with open(cache_path, "r") as f:
+                data = json.load(f)
+            _cached_eda = DatasetEDAResponse(**data)
+            print(f"[OK] EDA stats loaded from cache: {_cached_eda.totalRecords} records")
+            return _cached_eda
+        except Exception as e:
+            print(f"[WARN] Gagal membaca EDA cache: {e}")
+
     if not os.path.exists(DATASET_PATH):
         print(f"[WARN] Dataset tidak ditemukan: {DATASET_PATH}")
         return DatasetEDAResponse()
