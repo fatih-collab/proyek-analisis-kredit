@@ -1,0 +1,47 @@
+# Dependencies & cache
+node_modules/
+.next/
+out/
+build/
+.vercel/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+catboost_info/
+
+# MLflow
+mlruns/
+mlartifacts/
+mlflow.db
+
+# Git
+.git/
+.github/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Notebooks (not needed in Docker)
+*.ipynb
+
+# DVC
+.dvc/
+.dvcignore
+
+# Dataset (too large, not needed in production Docker image)
+Dataset/
+*.csv
+
+# Logs
+*.log
+backend/prediction_logs.json
+
+# Gemini config
+.gemini/

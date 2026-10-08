@@ -1,0 +1,37 @@
+# ═══════════════════════════════════════════════════════════════════════
+# Docker Compose — PDBL-MLOPS Full Stack (Development & Local Testing)
+#
+# CATATAN: Railway TIDAK menggunakan docker-compose.yml.
+# File ini hanya untuk pengembangan lokal & testing.
+# Di Railway, setiap service di-deploy terpisah via Dockerfile.
+# ═══════════════════════════════════════════════════════════════════════
+
+services:
+  # ── Frontend (Next.js) ──
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://backend:8000
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # ── Backend (FastAPI) ──
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - CORS_ORIGINS=http://localhost:3000,http://frontend:3000
+      - DATABASE_URL=${DATABASE_URL:-sqlite:///./local_fallback.db}
+    restart: unless-stopped

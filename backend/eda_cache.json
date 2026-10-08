@@ -1,0 +1,240 @@
+{
+  "totalRecords": 113937,
+  "avgMonthlyIncome": 5438.11,
+  "medianMonthlyIncome": 4666.67,
+  "avgDTI": 0.2424,
+  "medianDTI": 0.22,
+  "avgCreditScore": 685.5,
+  "avgLoanAmount": 8337.01,
+  "medianLoanAmount": 6500.0,
+  "minLoanAmount": 1000.0,
+  "maxLoanAmount": 35000.0,
+  "loanAmountHistogram": [
+    {
+      "label": "$0-2k",
+      "value": 6473
+    },
+    {
+      "label": "$2k-5k",
+      "value": 38361
+    },
+    {
+      "label": "$5k-10k",
+      "value": 27020
+    },
+    {
+      "label": "$10k-15k",
+      "value": 18732
+    },
+    {
+      "label": "$15k-20k",
+      "value": 14775
+    },
+    {
+      "label": "$20k-25k",
+      "value": 4266
+    },
+    {
+      "label": "$25k-35k",
+      "value": 3880
+    },
+    {
+      "label": "$35k+",
+      "value": 430
+    }
+  ],
+  "loanStatusDistribution": {
+    "Current": 56576,
+    "Completed": 38074,
+    "Chargedoff": 11992,
+    "Defaulted": 5018,
+    "Past Due (1-15 days)": 806,
+    "Past Due (31-60 days)": 363,
+    "Past Due (61-90 days)": 313,
+    "Past Due (91-120 days)": 304,
+    "Past Due (16-30 days)": 265,
+    "FinalPaymentInProgress": 205
+  },
+  "termDistribution": {
+    "36": 87778,
+    "60": 24545,
+    "12": 1614
+  },
+  "prosperRatingDistribution": {
+    "A": 14551,
+    "AA": 5372,
+    "B": 15581,
+    "C": 47429,
+    "D": 14274,
+    "E": 9795,
+    "HR": 6935
+  },
+  "employmentDistribution": {
+    "Employed": 67322,
+    "Full-time": 26355,
+    "Self-employed": 6134,
+    "Not available": 5347,
+    "Other": 3806,
+    "Unknown": 2255,
+    "Part-time": 1088,
+    "Not employed": 835,
+    "Retired": 795
+  },
+  "incomeRangeDistribution": {
+    "$25,000-49,999": 39933,
+    "$50,000-74,999": 31050,
+    "$100,000+": 17337,
+    "$75,000-99,999": 16916,
+    "$1-24,999": 7274,
+    "Not employed": 806,
+    "$0": 621
+  },
+  "occupationTop10": {
+    "35": 28617,
+    "41": 13628,
+    "12": 4478,
+    "19": 4311,
+    "59": 3759,
+    "1": 3688,
+    "2": 3602,
+    "66": 3588,
+    "47": 3446,
+    "0": 3233
+  },
+  "borrowerStateTop10": {
+    "4": 14717,
+    "43": 6842,
+    "34": 6729,
+    "9": 6720,
+    "14": 5921,
+    "45": 5515,
+    "10": 5008,
+    "35": 4197,
+    "22": 3593,
+    "46": 3278
+  },
+  "homeownerDistribution": {
+    "1": 57478,
+    "0": 56459
+  },
+  "listingCategoryDistribution": {
+    "Debt Consolidation": 58308,
+    "Not Available": 16965,
+    "Other": 10494,
+    "Home Improvement": 7433,
+    "Business": 7189,
+    "Auto": 2572,
+    "Personal Loan": 2395,
+    "Household Expenses": 1996,
+    "Medical/Dental": 1522,
+    "Taxes": 885
+  },
+  "creditScoreHistogram": [
+    {
+      "label": "<500",
+      "value": 662
+    },
+    {
+      "label": "500-549",
+      "value": 3621
+    },
+    {
+      "label": "550-599",
+      "value": 2482
+    },
+    {
+      "label": "600-649",
+      "value": 19973
+    },
+    {
+      "label": "650-699",
+      "value": 33449
+    },
+    {
+      "label": "700-749",
+      "value": 37661
+    },
+    {
+      "label": "750-799",
+      "value": 11230
+    },
+    {
+      "label": "800+",
+      "value": 4859
+    }
+  ],
+  "creditScoreRanges": {
+    "<500": 662,
+    "500-549": 3621,
+    "550-599": 2482,
+    "600-649": 19973,
+    "650-699": 33449,
+    "700-749": 37661,
+    "750-799": 11230,
+    "800+": 4859
+  },
+  "dtiHistogram": [
+    {
+      "label": "0-10%",
+      "value": 11956
+    },
+    {
+      "label": "10-20%",
+      "value": 32852
+    },
+    {
+      "label": "20-30%",
+      "value": 38193
+    },
+    {
+      "label": "30-40%",
+      "value": 17671
+    },
+    {
+      "label": "40-50%",
+      "value": 7554
+    },
+    {
+      "label": "50-75%",
+      "value": 4288
+    },
+    {
+      "label": "75-100%",
+      "value": 1423
+    },
+    {
+      "label": "100%+",
+      "value": 0
+    }
+  ],
+  "monthlyIncomeHistogram": [
+    {
+      "label": "$0-2k",
+      "value": 8981
+    },
+    {
+      "label": "$2k-4k",
+      "value": 33795
+    },
+    {
+      "label": "$4k-6k",
+      "value": 32795
+    },
+    {
+      "label": "$6k-8k",
+      "value": 18806
+    },
+    {
+      "label": "$8k-10k",
+      "value": 8498
+    },
+    {
+      "label": "$10k-15k",
+      "value": 8021
+    },
+    {
+      "label": "$15k+",
+      "value": 3041
+    }
+  ]
+}
